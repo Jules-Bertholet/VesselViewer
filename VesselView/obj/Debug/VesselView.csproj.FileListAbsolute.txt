@@ -12,3 +12,4 @@ D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselView.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VesselView\obj\Debug\VesselView.dll
 D:\Users\jbb\github\VesselViewer\VesselView\obj\Debug\VesselView.pdb
+D:\Users\jbb\github\VesselViewer\VesselView\obj\Debug\VesselView.csprojResolveAssemblyReference.cache
