@@ -37,3 +37,4 @@ D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVDiscoDisplay.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.pdb
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.csproj.CoreCompileInputs.cache

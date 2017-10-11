@@ -33,3 +33,4 @@ D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.csproj.CoreCompileInputs.cache
