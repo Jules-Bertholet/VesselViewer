@@ -169,3 +169,9 @@ $RECYCLE.BIN/
 *.swp
 *.dll
 
+# Symlink for KSP directory
+Kerbal\ Space\ Program
+
+# GameData files which are copied shouldn't be committed
+GameData/VesselView/LICENSE
+GameData/VesselView/README.md
