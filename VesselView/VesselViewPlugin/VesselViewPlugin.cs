@@ -17,18 +17,16 @@ namespace VesselView
         //GUI stuff
         //Toolbar button
 
-        private IButton toolbarButton;
-
-        private ApplicationLauncherButton AppLauncherButton;
+        const string appPath = "VesselView/Textures/";
+        IButtonBar button;
 
         protected Rect windowPos;
-        private IButton buttonC;
         protected Rect windowCPos;
 
         //our screen
         RenderTexture screen;
         private VesselViewer viewer;
-        private ViewerSettings settings;
+        public ViewerSettings settings;
 
         private int customMode = 0;
         private static List<CustomModeSettings> customModes = new List<CustomModeSettings>();
@@ -79,7 +77,7 @@ namespace VesselView
             mySty.onNormal.textColor = mySty.onFocused.textColor = mySty.onHover.textColor = mySty.onActive.textColor = Color.green;
             mySty.padding = new RectOffset(8, 8, 8, 8);
 
-            
+
             if (windowID == 1)
             {
                 //draw the texture
@@ -91,7 +89,7 @@ namespace VesselView
                 GUILayout.BeginHorizontal(GUILayout.Height(h));
                 GUILayout.Label("Display configuration", myStyL, GUILayout.ExpandWidth(true));
                 GUILayout.EndHorizontal();
-               
+
                 GUILayout.BeginHorizontal(GUILayout.Height(h));
                 GUILayout.Label("Orientation: ", myStyL);
                 settings.drawPlane = GUILayout.SelectionGrid(settings.drawPlane, ViewerConstants.PLANES, ViewerConstants.PLANES.Length, mySty);
@@ -259,7 +257,7 @@ namespace VesselView
                 settings.colorModeFill = GUILayout.SelectionGrid(settings.colorModeFill, ViewerConstants.COLORMODES, ViewerConstants.COLORMODES.Length, mySty);
                // GUILayout.EndHorizontal();
                // GUILayout.BeginHorizontal();
-               
+
                 GUILayout.EndHorizontal();
 #if false
                 GUILayout.BeginHorizontal();
@@ -277,7 +275,7 @@ namespace VesselView
                 GUILayout.BeginHorizontal(GUILayout.Height(h));
                 settings.colorModeWire = GUILayout.SelectionGrid(settings.colorModeWire, ViewerConstants.COLORMODES, ViewerConstants.COLORMODES.Length, mySty);
                // GUILayout.EndHorizontal();
-              
+
                 GUILayout.EndHorizontal();
 #if false
                 if (GUILayout.Button("Dull:" + settings.colorModeFillDull, mySty, GUILayout.ExpandWidth(true)))//GUILayout.Button is "true" when clicked
@@ -304,7 +302,7 @@ namespace VesselView
 
                 settings.colorModeBox = GUILayout.SelectionGrid(settings.colorModeBox, ViewerConstants.COLORMODES, ViewerConstants.COLORMODES.Length, mySty);
                 // GUILayout.EndHorizontal();
-                
+
                 GUILayout.EndHorizontal();
 
 #if false
@@ -411,88 +409,19 @@ namespace VesselView
 
         }
 
-        Texture2D VV, VVconfig;
-
-        void ToggleMainWindow()
-        {
-            settings.screenVisible = !settings.screenVisible;
-        }
-        void onRightClick()
-        {
-            settings.configScreenVisible = !settings.configScreenVisible;
-        }
-
-        public void initToolbar()
-        {
-            if (VV == null)
-                VV = GameDatabase.Instance.GetTexture("VesselView/Textures/icon38", false);
-            if (VVconfig == null)
-                VVconfig = GameDatabase.Instance.GetTexture("VesselView/Textures/iconC38", false);
-            if (ToolbarManager.ToolbarAvailable &&
-                HighLogic.CurrentGame.Parameters.CustomParams<VesselViewerPluginSettings>().useToolbarIfAvailable)
-            {
-                //setup the toolbar buttons
-                toolbarButton = ToolbarManager.Instance.add("VV", "VVbutton");
-                toolbarButton.TexturePath = "VesselView/Textures/icon";
-                toolbarButton.ToolTip = "Vessel View";
-                toolbarButton.OnClick += (e) =>
-                {
-                    ToggleMainWindow();
-                };
-                buttonC = ToolbarManager.Instance.add("VVC", "VVbuttonC");
-                buttonC.TexturePath = "VesselView/Textures/iconC";
-                buttonC.ToolTip = "Vessel View Config";
-                buttonC.OnClick += (e) =>
-                {
-                    settings.configScreenVisible = !settings.configScreenVisible;
-                };
-                if (this.AppLauncherButton != null)
-                {
-                    ApplicationLauncher.Instance.RemoveModApplication(this.AppLauncherButton);
-                    this.AppLauncherButton = null;
-                }
-            }
-            else
-            {
-                if (this.AppLauncherButton == null)
-                {
-                    if (ApplicationLauncher.Instance != null)
-                    {
-                        this.AppLauncherButton = ApplicationLauncher.Instance.AddModApplication(
-                            this.ToggleMainWindow, this.ToggleMainWindow,
-                            null, null,
-                            null, null,
-                            ApplicationLauncher.AppScenes.FLIGHT,
-                            VV
-                        );
-                        this.AppLauncherButton.onRightClick = onRightClick;
-
-                    }
-                }
-                if (this.toolbarButton != null)
-                {
-                    this.toolbarButton.Destroy();
-                    this.toolbarButton = null;
-                }
-                if (this.buttonC != null)
-                {
-                    this.buttonC.Destroy();
-                    this.buttonC = null;
-                }
-            }
-        }
-
         /// <summary>
         /// Called after the scene is loaded.
         /// </summary>
         void Awake()
         {
-            if (toolbarButton == null && AppLauncherButton == null)
-                initToolbar();
-        }
-        void ReloadSettings(ConfigNode node)
-        {
-            initToolbar();
+            if (ToolbarManager.ToolbarAvailable)
+            {
+                button = new Toolbar(appPath, this);
+            }
+            else
+            {
+                button = new AppLauncher(appPath, this);
+            }
         }
 
         private void OnGUI()
@@ -511,9 +440,6 @@ namespace VesselView
             setupTexture();
             viewer = new VesselViewer();
             settings = viewer.basicSettings;
-
-            GameEvents.OnGameSettingsApplied.Add(initToolbar);
-            GameEvents.onGameStatePostLoad.Add(ReloadSettings);
         }
 
         /// <summary>
@@ -542,11 +468,10 @@ namespace VesselView
         /// </summary>
         void OnDestroy()
         {
-            //remove button from toolbar
-            toolbarButton.Destroy();
-            buttonC.Destroy();
-            GameEvents.OnGameSettingsApplied.Remove(initToolbar);
-            GameEvents.onGameStatePostLoad.Remove(ReloadSettings);
+            if (button != null)
+            {
+                button.Destroy();
+            }
         }
 
 
