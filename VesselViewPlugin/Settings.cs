@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-#if true
+#if false
 
 namespace VesselView
 {
@@ -24,9 +24,10 @@ namespace VesselView
         public override bool HasPresets { get { return false; } }
 
 
-
+#if false
         [GameParameters.CustomParameterUI("Use Blizzy toobar if available")]
         public bool useToolbarIfAvailable = true;
+#endif
 
         public override bool Enabled(MemberInfo member, GameParameters parameters)
         {

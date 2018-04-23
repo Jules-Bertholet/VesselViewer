@@ -27,7 +27,7 @@
 	int i2 = 0;
 	string s;
 
-	string versionfile =  @"D:\Users\jbb\github\VesselViewer\GameData\VesselView\VesselView.version";
+	string versionfile =  @"D:\Users\jbb\github\VesselViewer\VesselView.version";
 	if (!File.Exists(versionfile))
 	{
 		Write("File: " + versionfile + " missing\n");		

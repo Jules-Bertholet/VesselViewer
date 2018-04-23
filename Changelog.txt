@@ -25,3 +25,10 @@
 
 0.8.6.1
 		Updated the included Toolbar folder
+
+0.8.7
+	Updated for 1.4.1
+	Added support for ToolbarController
+	Added support for ClickThroughBlocker
+	Removed included Toolbar folder
+	Removed included JSI folder

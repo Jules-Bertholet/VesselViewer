@@ -1,0 +1,26 @@
+{
+  "NAME": "VesselViewerContinued",
+  "URL": "http://ksp-avc.cybutek.net/version.php?id=342",
+  "DOWNLOAD": "https://github.com/linuxgurugamer/VesselViewer/releases",
+  "VERSION": {
+    "MAJOR": 0,
+    "MINOR": 8,
+    "PATCH": 6,
+    "BUILD": 1
+  },
+  "KSP_VERSION": {
+    "MAJOR": 1,
+    "MINOR": 3,
+    "PATCH": 1
+  },
+  "KSP_VERSION_MIN": {
+    "MAJOR": 1,
+    "MINOR": 3,
+    "PATCH": 1
+  },
+  "KSP_VERSION_MAX": {
+    "MAJOR": 1,
+    "MINOR": 3,
+    "PATCH": 1
+  }
+}

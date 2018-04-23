@@ -5,6 +5,9 @@ using UnityEngine;
 using VesselView;
 using KSP.UI.Screens;
 
+using ClickThroughFix;
+using ToolbarControl_NS;
+
 namespace VesselView
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
@@ -17,12 +20,17 @@ namespace VesselView
         //GUI stuff
         //Toolbar button
 
-        private IButton toolbarButton;
+        //private IButton toolbarButton;
 
-        private ApplicationLauncherButton AppLauncherButton;
+        //private ApplicationLauncherButton AppLauncherButton;
+
+        ToolbarControl toolbarControl;
+        ToolbarControl toolbarControlConfig;
 
         protected Rect windowPos;
+#if false
         private IButton buttonC;
+#endif
         protected Rect windowCPos;
 
         //our screen
@@ -44,7 +52,7 @@ namespace VesselView
         private void drawGUI()
         {
             GUI.skin = HighLogic.Skin;
-            windowPos = GUILayout.Window(1, windowPos, WindowGUI, "Vessel View", GUILayout.MinWidth(screen.width), GUILayout.MaxWidth(screen.width), GUILayout.MinHeight(screen.height), GUILayout.MaxHeight(screen.height));
+            windowPos = ClickThruBlocker.GUILayoutWindow(1, windowPos, WindowGUI, "Vessel View", GUILayout.MinWidth(screen.width), GUILayout.MaxWidth(screen.width), GUILayout.MinHeight(screen.height), GUILayout.MaxHeight(screen.height));
         }
 
         /// <summary>
@@ -53,7 +61,7 @@ namespace VesselView
         private void drawGUIC()
         {
             GUI.skin = HighLogic.Skin;
-            windowCPos = GUILayout.Window(2, windowCPos, WindowGUI, "Vessel View Config", GUILayout.MinWidth(64));
+            windowCPos = ClickThruBlocker.GUILayoutWindow(2, windowCPos, WindowGUI, "Vessel View Config", GUILayout.MinWidth(64));
         }
 
         /// <summary>
@@ -411,8 +419,9 @@ namespace VesselView
 
         }
 
+#if false
         Texture2D VV, VVconfig;
-
+#endif
         void ToggleMainWindow()
         {
             settings.screenVisible = !settings.screenVisible;
@@ -424,10 +433,13 @@ namespace VesselView
 
         public void initToolbar()
         {
+#if false
             if (VV == null)
                 VV = GameDatabase.Instance.GetTexture("VesselView/Textures/icon38", false);
             if (VVconfig == null)
                 VVconfig = GameDatabase.Instance.GetTexture("VesselView/Textures/iconC38", false);
+#endif
+#if false
             if (ToolbarManager.ToolbarAvailable &&
                 HighLogic.CurrentGame.Parameters.CustomParams<VesselViewerPluginSettings>().useToolbarIfAvailable)
             {
@@ -480,15 +492,50 @@ namespace VesselView
                     this.buttonC = null;
                 }
             }
-        }
+#endif
+            if (toolbarControl == null)
+            {
+                toolbarControl = gameObject.AddComponent<ToolbarControl>();
+                toolbarControl.AddToAllToolbars(ToggleMainWindow, ToggleMainWindow,
+                    ApplicationLauncher.AppScenes.FLIGHT,
+                    MODID,
+                    "vesselViewerButton",
+                    "VesselView/Textures/icon-38",
+                    "VesselView/Textures/icon-24",
+                    MODNAME
+                );
 
+                toolbarControlConfig = gameObject.AddComponent<ToolbarControl>();
+                toolbarControlConfig.AddToAllToolbars(ToggleToolbarConfig, ToggleToolbarConfig,
+                    ApplicationLauncher.AppScenes.FLIGHT,
+                    MODIDCONFIG,
+                    "vesselViewerConfigButton",
+                    "VesselView/Textures/iconC-38",
+                    "VesselView/Textures/iconC-24",
+                    MODNAMECONFIG
+                );
+            }
+        }
+        internal const string MODID = "VesselViewer_NS";
+        internal const string MODNAME = "Vessel Viewer";
+
+        internal const string MODIDCONFIG = "VesselViewerConfig_NS";
+        internal const string MODNAMECONFIG = "Vessel Viewer Config";
+
+        void ToggleToolbarConfig()
+        {
+            settings.configScreenVisible = !settings.configScreenVisible;
+        }
         /// <summary>
         /// Called after the scene is loaded.
         /// </summary>
         void Awake()
         {
+#if false
             if (toolbarButton == null && AppLauncherButton == null)
-                initToolbar();
+#endif
+            initToolbar();
+
         }
         void ReloadSettings(ConfigNode node)
         {
@@ -543,8 +590,15 @@ namespace VesselView
         void OnDestroy()
         {
             //remove button from toolbar
+#if false
             toolbarButton.Destroy();
             buttonC.Destroy();
+#endif
+            toolbarControl.OnDestroy();
+            Destroy(toolbarControl);
+            toolbarControlConfig.OnDestroy();
+            Destroy(toolbarControlConfig);
+
             GameEvents.OnGameSettingsApplied.Remove(initToolbar);
             GameEvents.onGameStatePostLoad.Remove(ReloadSettings);
         }
