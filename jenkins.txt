@@ -36,6 +36,8 @@
 # 3:SOURCEFILE, DESTDIR
 3:VesselView.version,GameData/VesselView
 
+# 8: AdditionalMods to include
+8:JSI
 #
 # End of file
 #
