@@ -51,15 +51,15 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>R:\KSP_1.4.1_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="VesselViewRPM, Version=0.8.2.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\GameData\VesselView\Plugins\VesselViewRPM.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VesselViewPlugin\VesselViewPlugin.csproj">
       <Project>{bd4a4aa0-5a4e-4e64-9a91-577027ca30b3}</Project>
       <Name>VesselViewPlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VesselViewRPM\VesselViewRPM.csproj">
+      <Project>{a4582184-d575-4d3c-97d5-5a00fdac73fc}</Project>
+      <Name>VesselViewRPM</Name>
     </ProjectReference>
     <ProjectReference Include="..\VesselView\VesselView.csproj">
       <Project>{9fdb0e00-37db-4d1e-a258-7ada0eb70d49}</Project>

@@ -35,3 +35,4 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\ClickThroughBlocker.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\ToolbarControl.dll
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewRPM.pdb

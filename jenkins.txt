@@ -30,8 +30,8 @@
 2:VesselView,VesselView/VesselView.csproj,VesselView.version,GameData/VesselView/Plugins
 2:VesselViewPlugin,VesselViewPlugin/VesselViewPlugin.csproj,VesselView.version,GameData/VesselView/Plugins
 2:VesselViewRPM,VesselViewRPM/VesselViewRPM.csproj,VesselView.version,GameData/VesselView/Plugins
-2:VVDiscoDisplay,VVDiscoDisplay/VVDiscoDisplay.csproj,VesselView.version,GameData/VesselView/Plugins
 2:VVPartSelector,VVPartSelector/VVPartSelector.csproj,VesselView.version,GameData/VesselView/Plugins
+2:VVDiscoDisplay,VVDiscoDisplay/VVDiscoDisplay.csproj,VesselView.version,GameData/VesselView/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:VesselView.version,GameData/VesselView
