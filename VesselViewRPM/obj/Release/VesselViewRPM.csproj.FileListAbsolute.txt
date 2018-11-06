@@ -41,7 +41,6 @@ D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Release\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Release\VesselViewRPM.csproj.CoreCompileInputs.cache

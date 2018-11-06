@@ -28,7 +28,5 @@ D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselView.pdb
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ClickThroughBlocker.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ToolbarControl.dll

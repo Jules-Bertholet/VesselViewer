@@ -47,7 +47,6 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.csprojResolveAssemblyReference.cache
@@ -55,3 +54,6 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.cspro
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.pdb
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\ToolbarControl.dll
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\ClickThroughBlocker.dll
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Release\VesselViewRPM.pdb

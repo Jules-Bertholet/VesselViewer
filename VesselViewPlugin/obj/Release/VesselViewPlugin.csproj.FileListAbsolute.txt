@@ -42,10 +42,11 @@ D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Release\VesselViewPlugin.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Release\VesselViewPlugin.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Release\VesselViewPlugin.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Release\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Release\VesselViewPlugin.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\ClickThroughBlocker.dll
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Release\ToolbarControl.dll

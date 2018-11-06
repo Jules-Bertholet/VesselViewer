@@ -44,7 +44,6 @@ D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Release\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Release\VVPartSelector.csprojResolveAssemblyReference.cache

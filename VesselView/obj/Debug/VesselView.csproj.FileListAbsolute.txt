@@ -17,7 +17,6 @@ D:\Users\jbb\github\VesselViewer\VesselView\obj\Debug\VesselView.csproj.CopyComp
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\VesselView.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\Assembly-CSharp.dll
-D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\JSIPartUtilities.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\RasterPropMonitor.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\UnityEngine.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\UnityEngine.UI.dll
@@ -27,5 +26,4 @@ D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VesselView\bin\Debug\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VesselView\obj\Debug\VesselView.csprojResolveAssemblyReference.cache

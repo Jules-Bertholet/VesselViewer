@@ -30,9 +30,7 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\KSPAssets.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\Mono.Cecil.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\Ionic.Zip.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\TDx.TDxInput.dll
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\RedShellSDK.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselView.pdb
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\ClickThroughBlocker.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\ToolbarControl.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewRPM.pdb
