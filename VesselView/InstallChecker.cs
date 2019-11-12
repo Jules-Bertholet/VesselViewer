@@ -40,8 +40,8 @@ namespace VesselView
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class InstallChecker : MonoBehaviour
     {
-        private const string MODNAME = "Smart Stage";
-        private const string FOLDERNAME = "SmartStage";
+        private const string MODNAME = "VesselViewer";
+        private const string FOLDERNAME = "VesselView";
         private const string EXPECTEDPATH = FOLDERNAME + "/Plugins";
 
         protected void Start()
