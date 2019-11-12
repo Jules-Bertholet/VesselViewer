@@ -80,15 +80,15 @@ namespace VVPartSelector
                     {
                         if (linesPrinted >= scrollOffset)
                         {
-                            builder.Append("[-]PARTS");
                             if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_PARTS)
                             {
-                                builder.AppendLine(" <");
+                                builder.Append("> ");
                             }
                             else
                             {
-                                builder.AppendLine("");
+                                builder.Append("  ");
                             }
+                            builder.AppendLine("[-]PARTS");
                         }
                         linesPrinted++;
                         if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_PARTS) pointerPosition = linesPrinted;
@@ -96,15 +96,15 @@ namespace VVPartSelector
                         foreach (CustomPartTreeItem partItem in tree.selectedItem.children) {
                             if (linesPrinted >= scrollOffset)
                             {
-                                builder.Append(partItem.associatedPart.name);
                                 if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.PARTS & counter == tree.selectedItem.selectedLine)
                                 {
-                                    builder.AppendLine(" <");
+                                    builder.Append("> ");
                                 }
                                 else
                                 {
-                                    builder.AppendLine("");
+                                    builder.Append("  ");
                                 }
+                                builder.AppendLine(partItem.associatedPart.name);
                             }
                             linesPrinted++;
 
@@ -115,14 +115,14 @@ namespace VVPartSelector
                     else {
                         if (linesPrinted >= scrollOffset)
                         {
-                            builder.Append("[+]PARTS");
                             if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_PARTS)
                             {
-                                builder.AppendLine(" <");
+                                builder.Append("> ");
                             }
                             else {
-                                builder.AppendLine("");
+                                builder.Append("  ");
                             }
+                            builder.AppendLine("[+]PARTS");
                         }
                         linesPrinted++;
                         if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_PARTS) pointerPosition = linesPrinted;
@@ -134,14 +134,14 @@ namespace VVPartSelector
                     {
                         if (linesPrinted >= scrollOffset)
                         {
-                            builder.Append("[-]ACTIONS");
                             if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_ACTIONS)
                             {
-                                builder.AppendLine(" <");
+                                builder.Append("> ");
                             }
                             else {
-                                builder.AppendLine("");
+                                builder.Append("  ");
                             }
+                            builder.AppendLine("[-]ACTIONS");
                         }
                         linesPrinted++;
                         if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_ACTIONS) pointerPosition = linesPrinted;
@@ -149,15 +149,15 @@ namespace VVPartSelector
                         foreach (BaseEvent action in tree.selectedItem.getActivableEvents()) {
                             if (linesPrinted >= scrollOffset)
                             {
-                                builder.Append(action.guiName);
                                 if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.ACTIONS & counter == tree.selectedItem.selectedLine)
                                 {
-                                    builder.AppendLine(" <");
+                                    builder.Append("> ");
                                 }
                                 else
                                 {
-                                    builder.AppendLine("");
+                                    builder.Append("  ");
                                 }
+                                builder.AppendLine(action.guiName);
                             }
                             linesPrinted++;
                             if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.ACTIONS & counter == tree.selectedItem.selectedLine) pointerPosition = linesPrinted;
@@ -168,14 +168,14 @@ namespace VVPartSelector
                     {
                         if (linesPrinted >= scrollOffset)
                         {
-                            builder.Append("[+]ACTIONS");
                             if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_ACTIONS)
                                 {
-                                    builder.AppendLine(" <");
+                                    builder.Append("> ");
                                 }
                             else {
-                                    builder.AppendLine("");
+                                    builder.Append("  ");
                                 }
+                            builder.AppendLine("[+]ACTIONS");
                         }
                         linesPrinted++;
                         if (tree.selectedItem.selectionMode == (int)SELECTIONMODES.EXPAND_ACTIONS) pointerPosition = linesPrinted;
