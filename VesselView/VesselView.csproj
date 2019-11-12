@@ -67,7 +67,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="JSIPartUtilities">
-      <HintPath>$(KSPDIR)\GameData\JSI\PartUtilities\Plugins\JSIPartUtilities.dll</HintPath>
+      <HintPath>..\..\PartUtilities\PartUtilities\obj\Release\JSIPartUtilities.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

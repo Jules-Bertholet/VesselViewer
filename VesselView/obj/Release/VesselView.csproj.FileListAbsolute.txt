@@ -27,3 +27,12 @@ D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\Assembly
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\KSPAssets.xml
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\KSPUtil.xml
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\UnityEngine.xml
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\obj\Release\VesselView.csprojAssemblyReference.cache
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\obj\Release\VesselView.csproj.CoreCompileInputs.cache
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\bin\Release\VesselView.dll
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\bin\Release\VesselView.pdb
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\bin\Release\JSIPartUtilities.dll
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\bin\Release\JSIPartUtilities.pdb
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\obj\Release\VesselView.csproj.CopyComplete
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\obj\Release\VesselView.dll
+D:\Users\Jimmy\Documents\Fun Stuff\KSP stuff\Other source repositories\VesselViewer\VesselView\obj\Release\VesselView.pdb
