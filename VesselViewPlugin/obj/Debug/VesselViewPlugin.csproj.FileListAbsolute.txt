@@ -8,7 +8,6 @@ D:\Users\jbb\github\aa\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.
 D:\Users\jbb\github\aa\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.pdb
 D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\VesselView\Plugins\VesselViewPlugin.dll
 D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\VesselView\Plugins\VesselViewPlugin.pdb
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.dll
@@ -17,16 +16,9 @@ D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csp
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselViewPlugin.pdb
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Assembly-CSharp-firstpass.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Assembly-CSharp.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\UnityEngine.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\UnityEngine.UI.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselView.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\RasterPropMonitor.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\KSPTrackIR.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\KSPAssets.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Mono.Cecil.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\Ionic.Zip.dll
-D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\TDx.TDxInput.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselView.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ToolbarControl.dll
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ClickThroughBlocker.dll
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\JSIPartUtilities.dll
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csprojResolveAssemblyReference.cache

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VesselView;
+using VesselViewPlugin;
 using VesselViewRPM.menus;
 
 namespace VVDiscoDisplay
@@ -19,7 +20,7 @@ namespace VVDiscoDisplay
             //this registers a custom menu with the RPM version of VesselView
             VViewCustomMenusMenu.registerMenu(createMenu);
             //this registers a display mode with the plugin version
-            VesselViewPlugin.registerCustomMode(setup());
+            VesselView.VesselViewPlugin.registerCustomMode(setup());
             //this is also the place to do any other init you might want
             gradient = VesselViewer.genColorGradient(256);
         }

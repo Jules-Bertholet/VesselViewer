@@ -544,6 +544,11 @@ namespace VesselView
 
         private void OnGUI()
         {
+            if (settings == null)
+            {
+                Debug.Log("VesselView.VesselViewPlugin.OnGUI, settings is null");
+                return;
+            }
             if (settings.screenVisible)
                 drawGUI();
             if (settings.configScreenVisible)
@@ -553,14 +558,22 @@ namespace VesselView
         /// <summary>
         /// Use for constructor-like stuff.
         /// </summary>
-        void Start()
+        public void Start()
         {
+            Debug.Log("VesselView.VesselViewPlugin.Start 1");
             setupTexture();
+            Debug.Log("VesselView.VesselViewPlugin.Start 2");
             viewer = new VesselViewer();
+            Debug.Log("VesselView.VesselViewPlugin.Start 3");
+
             settings = viewer.basicSettings;
+            if (settings == null)
+                Debug.Log("VesselViewPlugin.Start, settings is null");
 
             GameEvents.OnGameSettingsApplied.Add(initToolbar);
             GameEvents.onGameStatePostLoad.Add(ReloadSettings);
+            Debug.Log("VesselView.VesselViewPlugin.Start 5");
+
         }
 
         /// <summary>

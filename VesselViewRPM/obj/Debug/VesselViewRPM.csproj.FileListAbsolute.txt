@@ -17,15 +17,6 @@ D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.Co
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselViewRPM.pdb
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\Assembly-CSharp-firstpass.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\Assembly-CSharp.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\RasterPropMonitor.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\UnityEngine.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\UnityEngine.UI.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselView.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\KSPTrackIR.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\KSPAssets.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\Mono.Cecil.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\Ionic.Zip.dll
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\TDx.TDxInput.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselView.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\JSIPartUtilities.dll

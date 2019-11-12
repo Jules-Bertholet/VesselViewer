@@ -29,9 +29,9 @@ namespace VesselView
         //gradient of colors for stage display
         private Color[] stageGradient;
         //line material
-        private readonly Material lineMaterial = JSI.JUtil.DrawLineMaterial();
+        private readonly Material lineMaterial ;
 
-        public ViewerSettings basicSettings=new ViewerSettings();
+        public ViewerSettings basicSettings;
         public CustomModeSettings customMode;
 
         private RenderTexture screenBuffer;
@@ -48,6 +48,10 @@ namespace VesselView
 
         public VesselViewer()
         {
+            Debug.Log("VesselViewer.cs, creating basicSettings");
+          
+            lineMaterial = JSIPartUtilities.JUtil.DrawLineMaterial();
+            basicSettings = new ViewerSettings();
             activeInstances.Add(this);
         }
 

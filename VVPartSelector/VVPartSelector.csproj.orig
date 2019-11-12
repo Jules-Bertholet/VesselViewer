@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9FDB0E00-37DB-4D1E-A258-7ADA0EB70D49}</ProjectGuid>
+    <ProjectGuid>{25066DA6-52BD-4289-A615-6F20A20FB5FE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VesselView</RootNamespace>
-    <AssemblyName>VesselView</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>VVPartSelector</RootNamespace>
+    <AssemblyName>VVPartSelector</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,8 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,23 +29,32 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyVersion.cs">
+      <DependentUpon>AssemblyVersion.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyVersion.tt</DependentUpon>
     </Compile>
-    <Compile Include="CustomModeSettings.cs" />
-    <Compile Include="InstallChecker.cs" />
-    <Compile Include="ViewerConstants.cs" />
-    <Compile Include="ViewerSettings.cs" />
-    <Compile Include="VesselViewer.cs" />
+    <Compile Include="CustomPartTree.cs" />
+    <Compile Include="CustomPartTreeItem.cs" />
+    <Compile Include="SelectorDataContainer.cs" />
+    <Compile Include="VViewMenuPartSelectorGlobal.cs" />
+    <Compile Include="VViewMenuPartSelectorTree.cs" />
+    <Compile Include="VVPartSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VVsinglePartSubmenu.cs" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <ProjectReference Include="..\VesselViewRPM\VesselViewRPM.csproj">
+      <Project>{a4582184-d575-4d3c-97d5-5a00fdac73fc}</Project>
+      <Name>VesselViewRPM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VesselView\VesselView.csproj">
+      <Project>{9fdb0e00-37db-4d1e-a258-7ada0eb70d49}</Project>
+      <Name>VesselView</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AssemblyVersion.tt">
@@ -59,15 +66,15 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\Assembly*.dll">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine*.dll">
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="JSIPartUtilities">
-      <HintPath>$(KSPDIR)\GameData\JSI\PartUtilities\Plugins\JSIPartUtilities.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -82,7 +89,6 @@ set textTemplatingPath="%25ProgramFiles(x86)%25\Microsoft Visual Studio\2017\Com
   <PropertyGroup>
     <PostBuildEvent>
 start /D D:\Users\jbb\github\VesselViewer /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
-
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

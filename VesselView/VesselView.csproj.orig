@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VesselView</RootNamespace>
     <AssemblyName>VesselView</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -31,7 +30,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyVersion.cs">
@@ -40,7 +38,6 @@
       <DependentUpon>AssemblyVersion.tt</DependentUpon>
     </Compile>
     <Compile Include="CustomModeSettings.cs" />
-    <Compile Include="InstallChecker.cs" />
     <Compile Include="ViewerConstants.cs" />
     <Compile Include="ViewerSettings.cs" />
     <Compile Include="VesselViewer.cs" />
@@ -59,15 +56,23 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\Assembly*.dll">
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine*.dll">
-      <Private>False</Private>
+    <Reference Include="JSIPartUtilities">
+      <HintPath>R:\KSP_1.7.3_dev\GameData\JSI\PartUtilities\Plugins\JSIPartUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="RasterPropMonitor">
+      <HintPath>R:\KSP_1.7.3_dev\GameData\JSI\RasterPropMonitor\Plugins\RasterPropMonitor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="JSIPartUtilities">
-      <HintPath>$(KSPDIR)\GameData\JSI\PartUtilities\Plugins\JSIPartUtilities.dll</HintPath>
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>R:\KSP_1.7.3_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

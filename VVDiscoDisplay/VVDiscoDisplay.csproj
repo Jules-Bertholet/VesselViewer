@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VVDiscoDisplay</RootNamespace>
     <AssemblyName>VVDiscoDisplay</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyVersion.cs">
@@ -41,16 +43,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+     <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\Assembly*.dll">
+	   <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="UnityEngine">
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine*.dll">
+	   <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />	
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VesselViewPlugin\VesselViewPlugin.csproj">
