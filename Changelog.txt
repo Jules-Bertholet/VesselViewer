@@ -40,3 +40,4 @@ ChangeLog
 0.8.8
 	Updated for KSP 1.8
 	Added InstallChecker
+	Updated all AssemblyVersion.tt files
