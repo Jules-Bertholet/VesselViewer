@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using KSP.UI.Screens;
+using System.Linq;
 
 namespace VesselView
 {
@@ -28,9 +29,9 @@ namespace VesselView
         //gradient of colors for stage display
         private Color[] stageGradient;
         //line material
-        private readonly Material lineMaterial = JSI.JUtil.DrawLineMaterial();
+        private readonly Material lineMaterial ;
 
-        public ViewerSettings basicSettings=new ViewerSettings();
+        public ViewerSettings basicSettings;
         public CustomModeSettings customMode;
 
         private RenderTexture screenBuffer;
@@ -47,6 +48,10 @@ namespace VesselView
 
         public VesselViewer()
         {
+            Debug.Log("VesselViewer.cs, creating basicSettings");
+          
+            lineMaterial = JSIPartUtilities.JUtil.DrawLineMaterial();
+            basicSettings = new ViewerSettings();
             activeInstances.Add(this);
         }
 
@@ -728,8 +733,8 @@ namespace VesselView
 
         private void renderCOM(Matrix4x4 screenMatrix)
         {
-            
-            Vector3 COM = FlightGlobals.ActiveVessel.findLocalCenterOfMass();
+//            Vector3 COM = FlightGlobals.ActiveVessel.findLocalCenterOfMass();
+            Vector3 COM = FlightGlobals.ActiveVessel.localCoM;
             //MonoBehaviour.print("COM>"+COM);
             Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
             //transMatrix = screenMatrix * transMatrix;
@@ -739,10 +744,12 @@ namespace VesselView
             float div = 6 / basicSettings.scaleFact;
             renderIcon(new Rect(-div + COM.x, -div + COM.y, 2 * div, 2 * div), screenMatrix, Color.magenta, (int)ViewerConstants.ICONS.SQUARE_DIAMOND);
         }
-
+/*
+        // Never used
         private void renderCOP(Matrix4x4 screenMatrix)
         {
-            Vector3 COP = FlightGlobals.ActiveVessel.findLocalCenterOfPressure();
+//            Vector3 COP = FlightGlobals.ActiveVessel.findLocalCenterOfPressure();
+            Vector3 COP = FlightGlobals.ActiveVessel.;
             //MonoBehaviour.print("COM>"+COM);
             Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
             //transMatrix = screenMatrix * transMatrix;
@@ -753,9 +760,11 @@ namespace VesselView
             renderIcon(new Rect(-div + COP.x, -div + COP.y, 2 * div, 2 * div), screenMatrix, Color.cyan, (int)ViewerConstants.ICONS.SQUARE_DIAMOND);
         }
 
+        // Never used
         private void renderMOI(Matrix4x4 screenMatrix)
         {
-            Vector3 MOI = FlightGlobals.ActiveVessel.findLocalMOI();
+//            Vector3 MOI = FlightGlobals.ActiveVessel.findLocalMOI();
+            Vector3 MOI = FlightGlobals.ActiveVessel.MOI;
             //MonoBehaviour.print("COM>"+COM);
             Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
             //transMatrix = screenMatrix * transMatrix;
@@ -765,7 +774,7 @@ namespace VesselView
             float div = 6 / basicSettings.scaleFact;
             renderIcon(new Rect(-div + MOI.x, -div + MOI.y, 2 * div, 2 * div), screenMatrix, Color.yellow, (int)ViewerConstants.ICONS.SQUARE_DIAMOND);
         }
-
+*/
         /// <summary>
         /// Renders a single part and adds all its children to the draw queue.
         /// Also adds its bounding box to the bounding box queue.
@@ -980,7 +989,8 @@ namespace VesselView
                 }
             }
 
-            SkinnedMeshRenderer[] skinnedMeshes = (SkinnedMeshRenderer[])part.FindModelComponents<SkinnedMeshRenderer>();
+//            SkinnedMeshRenderer[] skinnedMeshes = (SkinnedMeshRenderer[])part.FindModelComponents<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer[] skinnedMeshes = part.FindModelComponents<SkinnedMeshRenderer>().ToArray();
             foreach (SkinnedMeshRenderer smesh in skinnedMeshes)
             {
                 if (smesh.gameObject.activeInHierarchy)
@@ -1313,6 +1323,8 @@ namespace VesselView
         /// <returns></returns>
         private Matrix4x4 genTransMatrix(Transform meshTrans, Vessel vessel, bool zeroFlatter)
         {
+            //extraRot
+
             //the mesh transform matrix in local space (which is what we want)
             //is essentialy its world transform matrix minus the transformations
             //applied to the whole vessel.
@@ -1341,6 +1353,7 @@ namespace VesselView
                             break;
                     }
                 }
+
             int spinAxis = 0;
             if (customMode == null)
                 {
@@ -1565,7 +1578,7 @@ namespace VesselView
                     //first we need an appropriate gradient, so check if we have it
                     //and make it if we dont, or if its too small
                     if (stagesThisTimeMax < part.inverseStage) stagesThisTimeMax = part.inverseStage;
-                    
+
                     int neededColors = Math.Max(stagesLastTime, Math.Max(StageManager.StageCount, stagesThisTimeMax)) + 1;
                     if (stageGradient == null)
                     {
@@ -1575,16 +1588,16 @@ namespace VesselView
                     {
                         stageGradient = genColorGradient(neededColors);
                     }
-                    //now return the color 
+                    //now return the color
                     //print("part " + part.name + " inv. stage " + part.inverseStage);
-                    if (part.inverseStage >= stageGradient.Length) return Color.magenta;
+                    if ((part.inverseStage < 0) || (part.inverseStage >= stageGradient.Length)) return Color.magenta;
                     return stageGradient[part.inverseStage];
                 case (int)ViewerConstants.COLORMODE.HEAT:
                     //colors the part according to how close its to exploding due to overheat
                     Color color = new Color(0.2f, 0.2f, 0.2f);
-                    if (part.maxTemp != 0)
+                    if ((part.maxTemp != 0) && (part.skinMaxTemp != 0))
                     {
-                        double tempDiff = part.temperature / part.maxTemp;
+                        double tempDiff = (part.temperature > part.skinTemperature) ? (part.temperature / part.maxTemp) : (part.skinTemperature / part.skinMaxTemp);
                         //to power of THREE to emphasise overheating parts MORE
                         tempDiff = Math.Pow(tempDiff, 3);
                         //color.g = 0.2f;
@@ -1598,7 +1611,8 @@ namespace VesselView
                     }
                 case (int)ViewerConstants.COLORMODE.FUEL:
                     Color color2 = Color.red;
-                    List<PartResource> resList = part.Resources.list;
+//                  List<PartResource> resList = part.Resources.list;
+                    List<PartResource> resList = part.Resources.dict.Values.ToList();
                     int resCount = resList.Count;
                     int emptyRes = 0;
                     double totalResFraction = 0;

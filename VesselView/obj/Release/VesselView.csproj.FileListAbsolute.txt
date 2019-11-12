@@ -27,7 +27,3 @@ D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\Assembly
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\KSPAssets.xml
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\KSPUtil.xml
 D:\Users\jbb\github\VesselViewer\VesselView\GameData\VesselView\Plugins\UnityEngine.xml
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselView.dll
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselView.pdb
-D:\Users\jbb\github\VesselViewer\VesselView\obj\Release\VesselView.dll
-D:\Users\jbb\github\VesselViewer\VesselView\obj\Release\VesselView.pdb

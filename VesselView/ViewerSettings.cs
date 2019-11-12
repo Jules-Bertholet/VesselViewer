@@ -5,7 +5,7 @@ namespace VesselView
     public class ViewerSettings
     {
         //---------------------------------------------------------------------------
-        //editable settings
+        //editable settings      
 
         //part-specific color options
         public int colorModeFill = (int)ViewerConstants.COLORMODE.FUEL;

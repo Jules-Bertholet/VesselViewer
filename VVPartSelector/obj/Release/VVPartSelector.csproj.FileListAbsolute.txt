@@ -30,8 +30,3 @@ D:\Users\jbb\github\VesselViewer\VVPartSelector\GameData\VesselView\Plugins\Asse
 D:\Users\jbb\github\VesselViewer\VVPartSelector\GameData\VesselView\Plugins\UnityEngine.xml
 D:\Users\jbb\github\VesselViewer\VVPartSelector\GameData\VesselView\Plugins\KSPUtil.xml
 D:\Users\jbb\github\VesselViewer\VVPartSelector\GameData\VesselView\Plugins\KSPAssets.xml
-D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Release\VVPartSelector.csprojResolveAssemblyReference.cache
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVPartSelector.dll
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVPartSelector.pdb
-D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Release\VVPartSelector.dll
-D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Release\VVPartSelector.pdb

@@ -32,8 +32,3 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\GameData\VesselView\Plugins\Asse
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\GameData\VesselView\Plugins\UnityEngine.xml
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\GameData\VesselView\Plugins\KSPUtil.xml
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\GameData\VesselView\Plugins\KSPAssets.xml
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVDiscoDisplay.dll
-D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVDiscoDisplay.pdb
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.csprojResolveAssemblyReference.cache
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.dll
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Release\VVDiscoDisplay.pdb

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VesselViewPlugin", "VesselViewPlugin\VesselViewPlugin.csproj", "{BD4A4AA0-5A4E-4E64-9A91-577027CA30B3}"
 EndProject
@@ -13,21 +13,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VVPartSelector", "VVPartSel
 	ProjectSection(ProjectDependencies) = postProject
 		{9FDB0E00-37DB-4D1E-A258-7ADA0EB70D49} = {9FDB0E00-37DB-4D1E-A258-7ADA0EB70D49}
 		{A4582184-D575-4D3C-97D5-5A00FDAC73FC} = {A4582184-D575-4D3C-97D5-5A00FDAC73FC}
-		{BD4A4AA0-5A4E-4E64-9A91-577027CA30B3} = {BD4A4AA0-5A4E-4E64-9A91-577027CA30B3}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VVDiscoDisplay", "VVDiscoDisplay\VVDiscoDisplay.csproj", "{7FDAF494-8C9B-4803-B8E9-D7D5B0F6E6C1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9FDB0E00-37DB-4D1E-A258-7ADA0EB70D49} = {9FDB0E00-37DB-4D1E-A258-7ADA0EB70D49}
 		{A4582184-D575-4D3C-97D5-5A00FDAC73FC} = {A4582184-D575-4D3C-97D5-5A00FDAC73FC}
+		{25066DA6-52BD-4289-A615-6F20A20FB5FE} = {25066DA6-52BD-4289-A615-6F20A20FB5FE}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F7A24971-66BE-48BF-8245-F9262CA3DAF6}"
 	ProjectSection(SolutionItems) = preProject
-		buildRelease.sh = buildRelease.sh
+		buildRelease.bat = buildRelease.bat
 		Changelog.txt = Changelog.txt
-		clean.sh = clean.sh
-		GameData\VesselView\VesselView.version = GameData\VesselView\VesselView.version
+		deploy.bat = deploy.bat
+		jenkins.txt = jenkins.txt
+		VesselView.version = VesselView.version
 	EndProjectSection
 EndProject
 Global
@@ -59,6 +60,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D10B6657-4F86-4D8A-9246-6B28AF74807B}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
