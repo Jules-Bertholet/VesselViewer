@@ -48,11 +48,11 @@ namespace VesselViewRPM.menus
             {
                 if (activeItemPos == i)
                 {
-                    builder.AppendLine(item.getName() + " <");
+                    builder.AppendLine("> " + item.getName());
                 }
                 else
                 {
-                    builder.AppendLine(item.getName());
+                    builder.AppendLine("  " + item.getName());
                 }
                 i++;
             }

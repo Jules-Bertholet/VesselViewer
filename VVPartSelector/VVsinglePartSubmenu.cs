@@ -34,15 +34,15 @@ namespace VVPartSelector
             foreach (Part part in partList)
             {
                 //MonoBehaviour.print("Adding "+action+" to list");
-                if (linesPrinted >= scrollOffset)
-                    builder.Append(part.name);
-                linesPrinted++;
                 if (part == selection)
                 {
-                    if (linesPrinted >= scrollOffset) builder.AppendLine(" <");
+                    if (linesPrinted >= scrollOffset) builder.Append("> ");
                     pointerPosition = linesPrinted;
                 }
-                else if (linesPrinted >= scrollOffset) builder.AppendLine("");
+                else if (linesPrinted >= scrollOffset) builder.Append("  ");
+                if (linesPrinted >= scrollOffset)
+                    builder.AppendLine(part.name);
+                linesPrinted++;
             }
             if (pointerPosition == -1)
             {

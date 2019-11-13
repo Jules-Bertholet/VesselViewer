@@ -37,11 +37,11 @@ namespace VesselViewRPM.menus
             foreach (IVVSimpleMenuItem item in menuItems) {
                 if (activeItemPos == i)
                 {
-                    builder.AppendLine(item.ToString() + " <");
+                    builder.AppendLine("> " + item.ToString());
                 }
                 else 
                 {
-                    builder.AppendLine(item.ToString());
+                    builder.AppendLine("  " + item.ToString());
                 }
                 i++;
             }
