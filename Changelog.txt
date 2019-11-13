@@ -44,3 +44,7 @@ ChangeLog
 
 0.8.8.1
 	Updated path in one of the InstallCheckers
+
+0.8.8.2
+	Thanks to @Kerbas-ad-astra for the following:
+		Moved the RPM/MAS pointer to the beginning of the label rather than the end.
