@@ -51,3 +51,7 @@ ChangeLog
 
 0.8.8.3
 	Rebuild with  updated JSI PartUtilities
+
+0.8.8.4
+	Added AssemblyFileVersion
+	Updated version file for 1.12
