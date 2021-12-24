@@ -37,7 +37,7 @@ namespace VVPartSelector
         // checks if the substring starting at [offset] matches the pattern
         // if it does, offset is advanced to the end of the pattern
         private bool MatchSubstring(string input, string pattern, ref int offset)
-		{
+        {
             int inputIndex = offset;
             for (int i = 0; i < pattern.Length && inputIndex < input.Length; ++i, ++inputIndex)
             {
@@ -46,17 +46,17 @@ namespace VVPartSelector
 
             offset = inputIndex;
             return true;
-		}
+        }
 
         Stack<string> colorStack = new Stack<string>();
 
         private void AppendRichTextLine(StringBuilder builder, string richText)
-		{
+        {
             colorStack.Clear();
             colorStack.Push("ffffff");
 
             for(int i = 0; i < richText.Length;)
-			{
+            {
                 if (richText[i] == '<')
                 {
                     if (MatchSubstring(richText, "<b>", ref i))
@@ -64,41 +64,41 @@ namespace VVPartSelector
                         builder.Append("[hw]");
                     }
                     else if (MatchSubstring(richText, "</b>", ref i))
-					{
+                    {
                         builder.Append("[/hw]");
-					}
+                    }
                     else if (MatchSubstring(richText, "<color=#", ref i))
-					{
+                    {
                         builder.Append("[#");
                         int colorStart = i;
                         while (i < richText.Length && richText[i] != '>')
-						{
+                        {
                             builder.Append(richText[i]);
                             ++i;
-						}
+                        }
 
                         colorStack.Push(richText.Substring(colorStart, i - colorStart));
 
                         builder.Append("]");
                         ++i;
-					}
+                    }
                     else if (MatchSubstring(richText, "</color>", ref i))
-					{
+                    {
                         if (colorStack.Count > 1) colorStack.Pop();
 
                         builder.Append("[#");
                         builder.Append(colorStack.Peek());
                         builder.Append("]");
-					}
+                    }
                 }
                 else
                 {
                     builder.Append(richText[i]);
                     ++i;
                 }
-			}
+            }
             builder.AppendLine();
-		}
+        }
 
         public void printMenu(ref StringBuilder builder, int width, int height)
         {
