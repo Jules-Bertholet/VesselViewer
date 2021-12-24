@@ -55,3 +55,10 @@ ChangeLog
 0.8.8.4
 	Added AssemblyFileVersion
 	Updated version file for 1.12
+
+0.8.8.5
+	Thanks to user @JohhyOThan for these:
+		fix waterfall meshes rendering in MFDs (ignore TransparentFX layer)
+		fix large radial drill not rendering correctly (BakeMesh doesn't handle scale properly)
+		fix rendering skinned meshes in both default + animated pose
+		removed some extra list copying
