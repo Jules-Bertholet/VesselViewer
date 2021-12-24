@@ -46,6 +46,8 @@ namespace VesselView
 
         private static List<VesselViewer> activeInstances = new List<VesselViewer>();
 
+        private static readonly int TransparentFxLayer = UnityEngine.LayerMask.NameToLayer("TransparentFX");
+
         public VesselViewer()
         {
             Debug.Log("VesselViewer.cs, creating basicSettings");
@@ -953,62 +955,57 @@ namespace VesselView
                     }
                 }
             }
-            
-            //now we need to get all meshes in the part
-            List<MeshFilter> meshFList = new List<MeshFilter>();
-            foreach (MeshFilter mf in part.transform.GetComponentsInChildren<MeshFilter>())
-            {
-                meshFList.Add(mf);
-            }
-            
-            //MeshFilter[] meshFilters = (MeshFilter[])part.FindModelComponents<MeshFilter>();
-            MeshFilter[] meshFilters = meshFList.ToArray();
+
             //used to determine the part bounding box
             Vector3 minVec = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 maxVec = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-            foreach (MeshFilter meshF in meshFilters)
+
+            //now we need to get all meshes in the part
+            foreach (MeshRenderer renderer in part.transform.GetComponentsInChildren<MeshRenderer>())
             {
-                if (!(meshF.gameObject.GetComponent<Renderer>() == null))
+                if (renderer.gameObject.layer == TransparentFxLayer) continue;
+
+                MeshFilter meshF = renderer.gameObject.GetComponent<MeshFilter>();
+
+                //only render those meshes that are active
+                //examples of inactive meshes seem to include
+                //parachute canopies, engine fairings...
+
+                if (renderer.gameObject.activeInHierarchy && meshF != null)
                 {
-                    //only render those meshes that are active
-                    //examples of inactive meshes seem to include
-                    //parachute canopies, engine fairings...
-                    
-                    if (meshF.gameObject.GetComponent<Renderer>().gameObject.activeInHierarchy)
-                    {
-                        Mesh mesh = meshF.mesh;
-                        //create the trans. matrix for this mesh (also update the bounds)
-                        Matrix4x4 transMatrix = genTransMatrix(meshF.transform, FlightGlobals.ActiveVessel,false);
-                        updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
-                        transMatrix = scrnMatrix * transMatrix;
-                        //now render it
-                        if(!partColor.Equals(Color.black))
-                            //renderMesh(mesh, transMatrix, partColor);
-                            renderMesh(mesh.triangles, mesh.vertices, transMatrix, partColor);
-                    }
+                    Mesh mesh = meshF.mesh;
+                    //create the trans. matrix for this mesh (also update the bounds)
+                    Matrix4x4 transMatrix = genTransMatrix(meshF.transform, FlightGlobals.ActiveVessel, false);
+                    updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
+                    transMatrix = scrnMatrix * transMatrix;
+                    //now render it
+                    if (!partColor.Equals(Color.black))
+                        //renderMesh(mesh, transMatrix, partColor);
+                        renderMesh(mesh.triangles, mesh.vertices, transMatrix, partColor);
                 }
             }
 
-//            SkinnedMeshRenderer[] skinnedMeshes = (SkinnedMeshRenderer[])part.FindModelComponents<SkinnedMeshRenderer>();
-            SkinnedMeshRenderer[] skinnedMeshes = part.FindModelComponents<SkinnedMeshRenderer>().ToArray();
-            foreach (SkinnedMeshRenderer smesh in skinnedMeshes)
+            foreach (SkinnedMeshRenderer smesh in part.FindModelComponents<SkinnedMeshRenderer>())
             {
+                if (smesh.gameObject.layer == TransparentFxLayer) continue;
+
                 if (smesh.gameObject.activeInHierarchy)
                 {
                     //skinned meshes seem to be not nearly as conveniently simple
                     //luckily, I can apparently ask them to do all the work for me
                     smesh.BakeMesh(bakedMesh);
                     //create the trans. matrix for this mesh (also update the bounds)
-                    Matrix4x4 transMatrix = genTransMatrix(part.transform, FlightGlobals.ActiveVessel,false);
-                    updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
+                    Matrix4x4 scalingTransform = Matrix4x4.Scale(new Vector3(1.0f / smesh.transform.lossyScale.x, 1.0f / smesh.transform.lossyScale.y, 1.0f / smesh.transform.lossyScale.z));
+                    Matrix4x4 transMatrix = genTransMatrix(smesh.transform.localToWorldMatrix * scalingTransform, FlightGlobals.ActiveVessel, false);
+					updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
                     if (!partColor.Equals(Color.black))
                         //renderMesh(bakedMesh, transMatrix, partColor);
                         renderMesh(bakedMesh.triangles, bakedMesh.vertices, transMatrix, partColor);
                 }
-                
             }
+
             bool addToTotals = false;
             if (customMode == null) addToTotals = true;
             else if (customMode.focusSubset.Count == 0) addToTotals = true;
@@ -1323,12 +1320,17 @@ namespace VesselView
         /// <returns></returns>
         private Matrix4x4 genTransMatrix(Transform meshTrans, Vessel vessel, bool zeroFlatter)
         {
+            return genTransMatrix(meshTrans.localToWorldMatrix, vessel, zeroFlatter);
+        }
+
+        private Matrix4x4 genTransMatrix(Matrix4x4 localToWorldMatrix, Vessel vessel, bool zeroFlatter)
+        {
             //extraRot
 
             //the mesh transform matrix in local space (which is what we want)
             //is essentialy its world transform matrix minus the transformations
             //applied to the whole vessel.
-            Matrix4x4 meshTransMatrix = vessel.vesselTransform.localToWorldMatrix.inverse * meshTrans.localToWorldMatrix;
+            Matrix4x4 meshTransMatrix = vessel.vesselTransform.localToWorldMatrix.inverse * localToWorldMatrix;
             //might also need some rotation to show a different side
             transformTemp.transform.rotation = Quaternion.identity;
             //NavBall stockNavBall = GameObject.Find("NavBall").GetComponent<NavBall>();
