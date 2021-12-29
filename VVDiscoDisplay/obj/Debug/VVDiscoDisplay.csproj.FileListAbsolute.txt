@@ -10,6 +10,7 @@ D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Vess
 D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\VesselView\Plugins\VVDiscoDisplay.pdb
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVDiscoDisplay.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVDiscoDisplay.pdb
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.csproj.AssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VVDiscoDisplay.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VVDiscoDisplay.pdb
@@ -22,7 +23,7 @@ D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\JSIPartUtilities.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\VesselView.pdb
-D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.csprojResolveAssemblyReference.cache
+D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\bin\Debug\ClickThroughBlocker.pdb
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.dll
 D:\Users\jbb\github\VesselViewer\VVDiscoDisplay\obj\Debug\VVDiscoDisplay.pdb

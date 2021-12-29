@@ -62,3 +62,8 @@ ChangeLog
 		fix large radial drill not rendering correctly (BakeMesh doesn't handle scale properly)
 		fix rendering skinned meshes in both default + animated pose
 		removed some extra list copying
+
+0.8.8.6
+	Thanks to user @JonnyOThan for these:
+		fix duplicated custom menus
+		handle rich text tags in part selector

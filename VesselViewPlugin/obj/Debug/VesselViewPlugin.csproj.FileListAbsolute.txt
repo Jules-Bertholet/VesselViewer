@@ -10,6 +10,7 @@ D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Vess
 D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\VesselView\Plugins\VesselViewPlugin.pdb
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewPlugin.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csproj.AssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselViewPlugin.pdb
@@ -18,6 +19,7 @@ D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ToolbarControl.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselView.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\JSIPartUtilities.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\VesselView.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewPlugin\bin\Debug\ClickThroughBlocker.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.dll
 D:\Users\jbb\github\VesselViewer\VesselViewPlugin\obj\Debug\VesselViewPlugin.pdb

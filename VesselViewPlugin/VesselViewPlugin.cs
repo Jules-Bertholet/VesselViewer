@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 //using Toolbar;
 using VesselView;
-using KSP.UI.Screens;
-
-using ClickThroughFix;
 using ToolbarControl_NS;
+using KSP.UI.Screens;
+using ClickThroughFix;
 
 namespace VesselView
 {

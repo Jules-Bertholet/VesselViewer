@@ -10,13 +10,13 @@ D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Vess
 D:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\VesselView\Plugins\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VesselViewRPM.pdb
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.CoreCompileInputs.cache
-D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csprojResolveAssemblyReference.cache
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselView.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\JSIPartUtilities.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\bin\Debug\VesselView.pdb
+D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.AssemblyReference.cache
+D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\VesselViewRPM\obj\Debug\VesselViewRPM.pdb

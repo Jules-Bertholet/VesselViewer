@@ -10,7 +10,6 @@ D:\Users\jbb\github\aa\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.dll
 D:\Users\jbb\github\aa\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.pdb
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVPartSelector.dll
 D:\Users\jbb\github\VesselViewer\GameData\VesselView\Plugins\VVPartSelector.pdb
-D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VVPartSelector.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VVPartSelector.pdb
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VesselView.dll
@@ -18,7 +17,8 @@ D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VesselViewRPM.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\JSIPartUtilities.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VesselViewRPM.pdb
 D:\Users\jbb\github\VesselViewer\VVPartSelector\bin\Debug\VesselView.pdb
-D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.csprojResolveAssemblyReference.cache
+D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.csproj.AssemblyReference.cache
+D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.csproj.CoreCompileInputs.cache
 D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.csproj.CopyComplete
 D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.dll
 D:\Users\jbb\github\VesselViewer\VVPartSelector\obj\Debug\VVPartSelector.pdb
