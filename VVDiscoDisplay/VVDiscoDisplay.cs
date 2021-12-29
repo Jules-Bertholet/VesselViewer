@@ -6,7 +6,7 @@ using VesselViewRPM.menus;
 
 namespace VVDiscoDisplay
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.Flight, true)]
     public class VVDiscoDisplay : MonoBehaviour
     {
 

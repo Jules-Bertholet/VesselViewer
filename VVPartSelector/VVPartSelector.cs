@@ -6,7 +6,7 @@ using VesselView;
 
 namespace VVPartSelector
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.Flight, true)]
     public class VVPartSelector : MonoBehaviour
     {
 
