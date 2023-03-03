@@ -51,6 +51,7 @@ namespace VesselView
         public VesselViewer()
         {
             Debug.Log("VesselViewer.cs, creating basicSettings");
+            // TODO: it would probably be better if we had a shader that worked with GL.Color
             lineMaterial = new Material(Shader.Find("Unlit/Color"));
             basicSettings = new ViewerSettings();
             activeInstances.Add(this);
@@ -1067,8 +1068,8 @@ namespace VesselView
         {
             GL.Begin(GL.QUADS);
             GL.Color(Color.black);
-            //lineMaterial.color = Color.black;
-            //lineMaterial.SetPass(0);
+            lineMaterial.color = Color.black;
+            lineMaterial.SetPass(0);
             GL.wireframe = false;
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMin, 0.1f)));
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMax, 0.1f)));
@@ -1080,8 +1081,8 @@ namespace VesselView
             //setup GL, then render the lines
             GL.Begin(GL.LINES);
             GL.Color(color);
-            //lineMaterial.color = color;
-            //lineMaterial.SetPass(0);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             float xMid = ((rect.xMax - rect.xMin) / 2) + rect.xMin;
             float yMid = ((rect.yMax - rect.yMin) / 2) + rect.yMin;
             float xOneFourth = ((xMid - rect.xMin) / 2) + rect.xMin;
