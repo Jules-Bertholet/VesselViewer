@@ -1290,15 +1290,18 @@ namespace VesselView
             //simplest way to do this is to take the corner points of the bound. box
             //multiply them by the transformation matrix, and get the mins/maxes from the results
             //its a bit of math done on the CPU but insignificant compared to the number of vertices
-            
-            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.min.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.min.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.min.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.min.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.max.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.max.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.max.z), ref minVec, ref maxVec);
-            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.max.z), ref minVec, ref maxVec);
+
+            Vector3 boundsMin = meshBounds.min;
+            Vector3 boundsMax = meshBounds.max;
+
+            EnclosePoint(transMatrix * new Vector3(boundsMin.x, boundsMin.y, boundsMin.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMax.x, boundsMin.y, boundsMin.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMin.x, boundsMax.y, boundsMin.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMax.x, boundsMax.y, boundsMin.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMin.x, boundsMin.y, boundsMax.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMax.x, boundsMin.y, boundsMax.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMin.x, boundsMax.y, boundsMax.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(boundsMax.x, boundsMax.y, boundsMax.z), ref minVec, ref maxVec);
         }
 
         /// <summary>
