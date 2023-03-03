@@ -210,29 +210,10 @@ namespace VesselView
                     Part next = partQueue.Dequeue();
                     if (next != null)
                     {
-                        renderPart(next, matrix, true);
+                        renderPart(next, matrix);
                     }
                 }
-                GL.Clear(true, false, Color.black);
-                if (partQueue.Count == 0)
-                {
-                    if (!FlightGlobals.ActiveVessel.isEVA)
-                    {
-                        partQueue.Enqueue(FlightGlobals.ActiveVessel.rootPart);
-                    }
-                }
-                //lineMaterial.SetPass(1);
-                //turn on wireframe, since triangles would get filled othershipwise
                 GL.wireframe = true;
-                //now render each part (assumes root part is in the queue)
-                while (partQueue.Count > 0)
-                {
-                    Part next = partQueue.Dequeue();
-                    if (next != null)
-                    {
-                        renderPart(next, matrix, false);
-                    }
-                }
                 //now render engine exhaust indicators
                 if (customMode == null)
                 {
@@ -899,7 +880,7 @@ namespace VesselView
         /// </summary>
         /// <param name="part">Part to render</param>
         /// <param name="scrnMatrix">Screen transform</param>
-        private void renderPart(Part part, Matrix4x4 scrnMatrix, bool fill)
+        private void renderPart(Part part, Matrix4x4 scrnMatrix)
         {
             //first off, add all the parts children to the queue
             foreach (Part child in part.children)
@@ -911,7 +892,8 @@ namespace VesselView
             }
             
             //get the appropriate colors
-            Color partColor = GetPartColor(part, fill);
+            Color fillPartColor = GetPartColor(part, true);
+            Color wirePartColor = GetPartColor(part, false);
             Color boxColor = GetBoxColor(part);
 
             //used to determine the part bounding box
@@ -944,8 +926,16 @@ namespace VesselView
                     updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!partColor.Equals(Color.black))
-                        renderMesh(mesh, transMatrix, partColor);
+                    if (!fillPartColor.Equals(Color.black))
+                    {
+                        GL.wireframe = false;
+                        renderMesh(mesh, transMatrix, fillPartColor);
+                    }
+                    if (!wirePartColor.Equals(Color.black))
+                    {
+                        GL.wireframe = true;
+                        renderMesh(mesh, transMatrix, wirePartColor);
+                    }
                 }
             }
 
@@ -965,15 +955,23 @@ namespace VesselView
                 {
                     //skinned meshes seem to be not nearly as conveniently simple
                     //luckily, I can apparently ask them to do all the work for me
-                    smesh.BakeMesh(bakedMesh);
+                    smesh.BakeMesh(bakedMesh); // TODO: I'm sure this is super slow - can we cache the baked mesh if it's not animating?
                     //create the trans. matrix for this mesh (also update the bounds)
                     Matrix4x4 scalingTransform = Matrix4x4.Scale(new Vector3(1.0f / smesh.transform.lossyScale.x, 1.0f / smesh.transform.lossyScale.y, 1.0f / smesh.transform.lossyScale.z));
                     Matrix4x4 transMatrix = genTransMatrix(smesh.transform.localToWorldMatrix * scalingTransform, FlightGlobals.ActiveVessel, false);
 					updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!partColor.Equals(Color.black))
-                        renderMesh(bakedMesh, transMatrix, partColor);
+                    if (!fillPartColor.Equals(Color.black))
+                    {
+                        GL.wireframe = false;
+                        renderMesh(bakedMesh, transMatrix, fillPartColor);
+                    }
+                    if (!wirePartColor.Equals(Color.black))
+                    {
+                        GL.wireframe = true;
+                        renderMesh(bakedMesh, transMatrix, wirePartColor);
+                    }
                 }
             }
 
@@ -992,13 +990,9 @@ namespace VesselView
                 if (maxVecG.y < maxVec.y) maxVecG.y = maxVec.y;
                 if (maxVecG.z < maxVec.z) maxVecG.z = maxVec.z;
             }
-            if (!fill) 
-            {
-                //and draw a box around the part (later)
-                rectQueue.Enqueue(new ViewerConstants.RectColor(new Rect((minVec.x), (minVec.y), (maxVec.x - minVec.x), (maxVec.y - minVec.y)), boxColor));
-            }
             
-            
+            //and draw a box around the part (later)
+            rectQueue.Enqueue(new ViewerConstants.RectColor(new Rect((minVec.x), (minVec.y), (maxVec.x - minVec.x), (maxVec.y - minVec.y)), boxColor));
         }
 
         /// <summary>
@@ -1073,6 +1067,8 @@ namespace VesselView
         {
             GL.Begin(GL.QUADS);
             GL.Color(Color.black);
+            //lineMaterial.color = Color.black;
+            //lineMaterial.SetPass(0);
             GL.wireframe = false;
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMin, 0.1f)));
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMax, 0.1f)));
@@ -1084,6 +1080,8 @@ namespace VesselView
             //setup GL, then render the lines
             GL.Begin(GL.LINES);
             GL.Color(color);
+            //lineMaterial.color = color;
+            //lineMaterial.SetPass(0);
             float xMid = ((rect.xMax - rect.xMin) / 2) + rect.xMin;
             float yMid = ((rect.yMax - rect.yMin) / 2) + rect.yMin;
             float xOneFourth = ((xMid - rect.xMin) / 2) + rect.xMin;
@@ -1276,7 +1274,7 @@ namespace VesselView
             //the mesh transform matrix in local space (which is what we want)
             //is essentialy its world transform matrix minus the transformations
             //applied to the whole vessel.
-            Matrix4x4 meshTransMatrix = vessel.vesselTransform.localToWorldMatrix.inverse * localToWorldMatrix;
+            Matrix4x4 meshTransMatrix = vessel.vesselTransform.worldToLocalMatrix * localToWorldMatrix;
             //might also need some rotation to show a different side
             transformTemp.transform.rotation = Quaternion.identity;
             //NavBall stockNavBall = GameObject.Find("NavBall").GetComponent<NavBall>();
