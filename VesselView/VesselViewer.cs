@@ -1298,13 +1298,13 @@ namespace VesselView
         /// <returns></returns>
         private Matrix4x4 genTransMatrix(Transform meshTrans, Vessel vessel, bool zeroFlatter)
         {
-            return genTransMatrix(meshTrans.localToWorldMatrix, vessel, zeroFlatter);
+            return worldToScreen * meshTrans.localToWorldMatrix;
         }
 
+#if false
         private Matrix4x4 genTransMatrix(Matrix4x4 localToWorldMatrix, Vessel vessel, bool zeroFlatter)
         {
             return worldToScreen * localToWorldMatrix;
-#if false
 
             //extraRot
 
@@ -1437,8 +1437,8 @@ namespace VesselView
             //scale z by zero to flatten and prevent culling
             meshTransMatrix = FLATTER * meshTransMatrix;
             return meshTransMatrix;
+    }
 #endif
-        }
 
         /// <summary>
         /// Calculate the ideal scale/offset.
