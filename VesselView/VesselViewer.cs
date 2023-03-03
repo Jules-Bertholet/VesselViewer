@@ -776,6 +776,11 @@ namespace VesselView
             renderIcon(new Rect(-div + MOI.x, -div + MOI.y, 2 * div, 2 * div), screenMatrix, Color.yellow, (int)ViewerConstants.ICONS.SQUARE_DIAMOND);
         }
 */
+
+        
+        static FieldInfo x_Part_modelMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo x_Part_modelSkinnedMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelSkinnedMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
+
         /// <summary>
         /// Renders a single part and adds all its children to the draw queue.
         /// Also adds its bounding box to the bounding box queue.
@@ -960,9 +965,16 @@ namespace VesselView
             Vector3 maxVec = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
             //now we need to get all meshes in the part
-            foreach (MeshRenderer renderer in part.transform.GetComponentsInChildren<MeshRenderer>())
+            var meshRenderers = (List<MeshRenderer>)x_Part_modelMeshRenderersCache_FieldInfo.GetValue(part);
+            if (meshRenderers == null)
             {
-                if (renderer.gameObject.layer == TransparentFxLayer) continue;
+                meshRenderers = part.FindModelComponents<MeshRenderer>();
+                x_Part_modelMeshRenderersCache_FieldInfo.SetValue(part, meshRenderers);
+            }
+
+            foreach (MeshRenderer renderer in meshRenderers)
+            {
+                if (renderer == null || renderer.gameObject.layer == TransparentFxLayer) continue;
 
                 MeshFilter meshF = renderer.gameObject.GetComponent<MeshFilter>();
 
@@ -983,9 +995,17 @@ namespace VesselView
                 }
             }
 
-            foreach (SkinnedMeshRenderer smesh in part.FindModelComponents<SkinnedMeshRenderer>())
+
+            var skinnedMeshRenderers = (List<SkinnedMeshRenderer>)x_Part_modelSkinnedMeshRenderersCache_FieldInfo.GetValue(part);
+            if (skinnedMeshRenderers == null)
             {
-                if (smesh.gameObject.layer == TransparentFxLayer) continue;
+                skinnedMeshRenderers = part.FindModelComponents<SkinnedMeshRenderer>();
+                x_Part_modelSkinnedMeshRenderersCache_FieldInfo.SetValue(part, skinnedMeshRenderers);
+            }
+
+            foreach (SkinnedMeshRenderer smesh in skinnedMeshRenderers)
+            {
+                if (smesh == null || smesh.gameObject.layer == TransparentFxLayer) continue;
 
                 if (smesh.gameObject.activeInHierarchy)
                 {
