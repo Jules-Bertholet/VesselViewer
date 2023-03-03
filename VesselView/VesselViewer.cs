@@ -1243,6 +1243,8 @@ namespace VesselView
             //setup GL, then render the lines
             GL.Begin(GL.LINES);
             GL.Color(color);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             renderLine(rect.xMin, rect.yMin, rect.xMax, rect.yMin, screenMatrix);
             renderLine(rect.xMax, rect.yMin, rect.xMax, rect.yMax, screenMatrix);
             renderLine(rect.xMax, rect.yMax, rect.xMin, rect.yMax, screenMatrix);
