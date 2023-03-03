@@ -1582,13 +1582,11 @@ namespace VesselView
                     }
                 case (int)ViewerConstants.COLORMODE.FUEL:
                     Color color2 = Color.red;
-//                  List<PartResource> resList = part.Resources.list;
-                    List<PartResource> resList = part.Resources.dict.Values.ToList();
-                    int resCount = resList.Count;
+                    int resCount = part.Resources.dict.Count;
                     int emptyRes = 0;
                     double totalResFraction = 0;
                     //go through all the resources in the part, add up their fullness
-                    foreach (PartResource resource in resList)
+                    foreach (PartResource resource in part.Resources.dict.Values)
                     {
                         //2 is almost empty anyway for all but the smallest tanks 
                         //and it eliminates things like intakes or power generating engines
