@@ -5,6 +5,7 @@ using UnityEngine;
 using KSP.UI.Screens;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 
 namespace VesselView
 {
@@ -761,9 +762,52 @@ namespace VesselView
         }
 */
 
-        
+        public static Func<S, T> CreateGetter<S, T>(FieldInfo field)
+        {
+            string methodName = field.ReflectedType.FullName + ".get_" + field.Name;
+            DynamicMethod setterMethod = new DynamicMethod(methodName, typeof(T), new Type[1] { typeof(S) }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
+            if (field.IsStatic)
+            {
+                gen.Emit(OpCodes.Ldsfld, field);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Ldfld, field);
+            }
+            gen.Emit(OpCodes.Ret);
+            return (Func<S, T>)setterMethod.CreateDelegate(typeof(Func<S, T>));
+        }
+
+        public static Action<S, T> CreateSetter<S, T>(FieldInfo field)
+        {
+            string methodName = field.ReflectedType.FullName + ".set_" + field.Name;
+            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(S), typeof(T) }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
+            if (field.IsStatic)
+            {
+                gen.Emit(OpCodes.Ldarg_1);
+                gen.Emit(OpCodes.Stsfld, field);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Ldarg_1);
+                gen.Emit(OpCodes.Stfld, field);
+            }
+            gen.Emit(OpCodes.Ret);
+            return (Action<S, T>)setterMethod.CreateDelegate(typeof(Action<S, T>));
+        }
+
+        // This could all be simpler and faster if we used a publicizer instead
         static FieldInfo x_Part_modelMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
         static FieldInfo x_Part_modelSkinnedMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelSkinnedMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        static Func<Part, List<MeshRenderer>> Part_GetMeshRenderers = CreateGetter<Part, List<MeshRenderer>>(x_Part_modelMeshRenderersCache_FieldInfo);
+        static Func<Part, List<SkinnedMeshRenderer>> Part_GetSkinnedMeshRenderers = CreateGetter<Part, List<SkinnedMeshRenderer>>(x_Part_modelSkinnedMeshRenderersCache_FieldInfo);
+        static Action<Part, List<MeshRenderer>> Part_SetMeshRenderers = CreateSetter<Part, List<MeshRenderer>>(x_Part_modelMeshRenderersCache_FieldInfo);
+        static Action<Part, List<SkinnedMeshRenderer>> Part_SetSkinnedMeshRenderers = CreateSetter<Part, List<SkinnedMeshRenderer>>(x_Part_modelSkinnedMeshRenderersCache_FieldInfo);
 
         Color GetPartColor(Part part, bool fill)
         {
@@ -904,11 +948,11 @@ namespace VesselView
             Vector3 maxVec = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
             //now we need to get all meshes in the part
-            var meshRenderers = (List<MeshRenderer>)x_Part_modelMeshRenderersCache_FieldInfo.GetValue(part);
+            var meshRenderers = Part_GetMeshRenderers(part);
             if (meshRenderers == null)
             {
                 meshRenderers = part.FindModelComponents<MeshRenderer>();
-                x_Part_modelMeshRenderersCache_FieldInfo.SetValue(part, meshRenderers);
+                Part_SetMeshRenderers(part, meshRenderers);
             }
 
             foreach (MeshRenderer renderer in meshRenderers)
@@ -943,11 +987,11 @@ namespace VesselView
             }
 
 
-            var skinnedMeshRenderers = (List<SkinnedMeshRenderer>)x_Part_modelSkinnedMeshRenderersCache_FieldInfo.GetValue(part);
+            var skinnedMeshRenderers = Part_GetSkinnedMeshRenderers(part);
             if (skinnedMeshRenderers == null)
             {
                 skinnedMeshRenderers = part.FindModelComponents<SkinnedMeshRenderer>();
-                x_Part_modelSkinnedMeshRenderersCache_FieldInfo.SetValue(part, skinnedMeshRenderers);
+                Part_SetSkinnedMeshRenderers(part, skinnedMeshRenderers);
             }
 
             foreach (SkinnedMeshRenderer smesh in skinnedMeshRenderers)
