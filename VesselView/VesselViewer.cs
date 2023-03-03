@@ -4,6 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using KSP.UI.Screens;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace VesselView
 {
@@ -15,9 +16,6 @@ namespace VesselView
         private Vector3 minVecG = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         private Vector3 maxVecG = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-        //used for temp transform because matrices are scary
-        private GameObject transformTemp = new GameObject();
-
         //time of last update
         private float lastUpdate = 0.0f;
 
@@ -25,6 +23,7 @@ namespace VesselView
         private Queue<Part> partQueue = new Queue<Part>();
         private Queue<ViewerConstants.RectColor> rectQueue = new Queue<ViewerConstants.RectColor>();
 
+        private Matrix4x4 worldToScreen;
 
         //gradient of colors for stage display
         private Color[] stageGradient;
@@ -159,6 +158,9 @@ namespace VesselView
             maxVecG = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             lastUpdate = Time.time;
             partQueue.Clear();
+
+            worldToScreen = FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+
             //FlightGlobals.ActiveVessel = FlightGlobals.ActiveVessel;
             if (!FlightGlobals.ActiveVessel.isEVA)
             {
@@ -923,7 +925,7 @@ namespace VesselView
                 {
                     Mesh mesh = meshF.mesh;
                     //create the trans. matrix for this mesh (also update the bounds)
-                    Matrix4x4 transMatrix = genTransMatrix(meshF.transform, FlightGlobals.ActiveVessel, false);
+                    Matrix4x4 transMatrix = worldToScreen * meshF.transform.localToWorldMatrix;
                     updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
@@ -959,8 +961,8 @@ namespace VesselView
                     smesh.BakeMesh(bakedMesh); // TODO: I'm sure this is super slow - can we cache the baked mesh if it's not animating?
                     //create the trans. matrix for this mesh (also update the bounds)
                     Matrix4x4 scalingTransform = Matrix4x4.Scale(new Vector3(1.0f / smesh.transform.lossyScale.x, 1.0f / smesh.transform.lossyScale.y, 1.0f / smesh.transform.lossyScale.z));
-                    Matrix4x4 transMatrix = genTransMatrix(smesh.transform.localToWorldMatrix * scalingTransform, FlightGlobals.ActiveVessel, false);
-					updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
+                    Matrix4x4 transMatrix = worldToScreen * (smesh.transform.localToWorldMatrix * scalingTransform);
+                    updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
                     if (!fillPartColor.Equals(Color.black))
@@ -1257,6 +1259,9 @@ namespace VesselView
 
         private Matrix4x4 genTransMatrix(Matrix4x4 localToWorldMatrix, Vessel vessel, bool zeroFlatter)
         {
+            return worldToScreen * localToWorldMatrix;
+#if false
+
             //extraRot
 
             //the mesh transform matrix in local space (which is what we want)
@@ -1388,6 +1393,7 @@ namespace VesselView
             //scale z by zero to flatten and prevent culling
             meshTransMatrix = FLATTER * meshTransMatrix;
             return meshTransMatrix;
+#endif
         }
 
         /// <summary>
