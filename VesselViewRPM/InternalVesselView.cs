@@ -84,15 +84,17 @@ namespace JSI.Handlers
         private bool forceRedraw = false;
         private bool textChanged = false;
 
+        StringBuilder builder = new StringBuilder();
+
         public string ShowMenu(int width, int height)
         {
             //MonoBehaviour.print("text draw call");           
-            StringBuilder builder = new StringBuilder();
+            builder.Clear();
             builder.AppendLine(pageTitle);
 
             if (activeMenu != null) {
                 IVViewMenu outMenu = activeMenu.update(FlightGlobals.ActiveVessel);
-                if (outMenu == null) activeMenu.printMenu(ref builder, width, height);
+                if (outMenu == null) activeMenu.printMenu(builder, width, height);
                 else activeMenu = outMenu;
             }
             //MonoBehaviour.print("text draw call done");
