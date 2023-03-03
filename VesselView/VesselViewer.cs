@@ -1257,28 +1257,28 @@ namespace VesselView
         /// <param name="maxVec">Reference to maximums-so-far vector</param>
         private void updateMinMax(Bounds meshBounds, Matrix4x4 transMatrix, ref Vector3 minVec, ref Vector3 maxVec)
         {
+            void EnclosePoint(Vector3 point, ref Vector3 minV, ref Vector3 maxV)
+            {
+                minV.x = Mathf.Min(minV.x, point.x);
+                minV.y = Mathf.Min(minV.y, point.y);
+                minV.z = Mathf.Min(minV.z, point.z);
+                maxV.x = Mathf.Max(maxV.x, point.x);
+                maxV.y = Mathf.Max(maxV.y, point.y);
+                maxV.z = Mathf.Max(maxV.z, point.z);
+            }
+
             //simplest way to do this is to take the corner points of the bound. box
             //multiply them by the transformation matrix, and get the mins/maxes from the results
             //its a bit of math done on the CPU but insignificant compared to the number of vertices
-            Vector3[] vertices = new Vector3[8];
-            vertices[0] = new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.min.z);
-            vertices[1] = new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.min.z);
-            vertices[2] = new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.min.z);
-            vertices[3] = new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.max.z);
-            vertices[4] = new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.min.z);
-            vertices[5] = new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.max.z);
-            vertices[6] = new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.max.z);
-            vertices[7] = new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.max.z);
-            foreach (Vector3 v1 in vertices)
-            {
-                Vector3 v = transMatrix.MultiplyPoint3x4(v1);
-                if (v.x < minVec.x) minVec.x = v.x;
-                if (v.y < minVec.y) minVec.y = v.y;
-                if (v.z < minVec.z) minVec.z = v.z;
-                if (v.x > maxVec.x) maxVec.x = v.x;
-                if (v.y > maxVec.y) maxVec.y = v.y;
-                if (v.z > maxVec.z) maxVec.z = v.z;
-            }
+            
+            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.min.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.min.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.min.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.min.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.max.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.max.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.max.z), ref minVec, ref maxVec);
+            EnclosePoint(transMatrix * new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.max.z), ref minVec, ref maxVec);
         }
 
         /// <summary>
