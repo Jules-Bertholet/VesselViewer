@@ -51,8 +51,7 @@ namespace VesselView
         public VesselViewer()
         {
             Debug.Log("VesselViewer.cs, creating basicSettings");
-          
-            lineMaterial = JSIPartUtilities.JUtil.DrawLineMaterial();
+            lineMaterial = new Material(Shader.Find("Unlit/Color"));
             basicSettings = new ViewerSettings();
             activeInstances.Add(this);
         }
@@ -980,8 +979,7 @@ namespace VesselView
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
                     if (!partColor.Equals(Color.black))
-                        //renderMesh(mesh, transMatrix, partColor);
-                        renderMesh(mesh.triangles, mesh.vertices, transMatrix, partColor);
+                        renderMesh(mesh, transMatrix, partColor);
                 }
             }
 
@@ -1001,8 +999,7 @@ namespace VesselView
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
                     if (!partColor.Equals(Color.black))
-                        //renderMesh(bakedMesh, transMatrix, partColor);
-                        renderMesh(bakedMesh.triangles, bakedMesh.vertices, transMatrix, partColor);
+                        renderMesh(bakedMesh, transMatrix, partColor);
                 }
             }
 
@@ -1040,40 +1037,12 @@ namespace VesselView
             //setup GL
             GL.PushMatrix();
             GL.MultMatrix(transMatrix);
-            GL.Begin(GL.TRIANGLES);
-            GL.Color(color);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             //and draw the triangles
             //TODO: Maybe it doesnt have to be done in immediate mode?
             //Unity GL doesnt seem to expose much, though.
             Graphics.DrawMeshNow(mesh, transMatrix);
-            GL.End();
-            GL.PopMatrix();
-        }
-
-        /// <summary>
-        /// Renders a mesh.
-        /// </summary>
-        /// <param name="triangles">Mesh triangles.</param>
-        /// <param name="vertices">Mesh vertices.</param>
-        /// <param name="transMatrix">Mesh transform.</param>
-        /// <param name="color">Color.</param>
-        private void renderMesh(int[] triangles, Vector3[] vertices, Matrix4x4 transMatrix, Color color)
-        {
-            //setup GL
-            GL.PushMatrix();
-            GL.MultMatrix(transMatrix);
-            GL.Begin(GL.TRIANGLES);
-            GL.Color(color);
-            //and draw the triangles
-            //TODO: Maybe it doesnt have to be done in immediate mode?
-            //Unity GL doesnt seem to expose much, though.
-            for (int i = 0; i < triangles.Length; i += 3)
-            {
-                GL.Vertex(vertices[triangles[i]]);
-                GL.Vertex(vertices[triangles[i + 1]]);
-                GL.Vertex(vertices[triangles[i + 2]]);
-            }
-            GL.End();
             GL.PopMatrix();
         }
 
