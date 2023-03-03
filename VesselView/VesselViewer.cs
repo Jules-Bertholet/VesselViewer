@@ -781,6 +781,118 @@ namespace VesselView
         static FieldInfo x_Part_modelMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
         static FieldInfo x_Part_modelSkinnedMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelSkinnedMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
 
+        Color GetPartColor(Part part, bool fill)
+        {
+            Color partColor = new Color();
+
+            if (customMode == null)
+            {
+                partColor = getPartColor(part, fill ? basicSettings.colorModeFill : basicSettings.colorModeWire);
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        partColor = getPartColor(part, fill ? basicSettings.colorModeFill : basicSettings.colorModeWire);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        partColor = getPartColor(part, fill ? customMode.staticSettings.colorModeFill : customMode.staticSettings.colorModeWire);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        partColor = fill ? customMode.fillColorDelegate(customMode, part) : customMode.wireColorDelegate(customMode, part);
+                        break;
+                }
+            }
+
+            bool dull = false;
+
+            if (customMode == null)
+            {
+                dull = fill ? basicSettings.colorModeFillDull : basicSettings.colorModeWireDull;
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        dull = fill ? basicSettings.colorModeFillDull : basicSettings.colorModeWireDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        dull = fill ? customMode.staticSettings.colorModeFillDull : customMode.staticSettings.colorModeWireDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        dull = fill ? customMode.fillColorDullDelegate(customMode) : customMode.wireColorDullDelegate(customMode);
+                        break;
+                }
+            }
+
+            if (dull)
+            {
+                partColor.r /= 2;
+                partColor.g /= 2;
+                partColor.b /= 2;
+            }
+
+            return partColor;
+        }
+
+        Color GetBoxColor(Part part)
+        {
+            Color boxColor = new Color();
+
+            if (customMode == null)
+            {
+                boxColor = getPartColor(part, basicSettings.colorModeBox);
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        boxColor = getPartColor(part, basicSettings.colorModeBox);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        boxColor = getPartColor(part, customMode.staticSettings.colorModeBox);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        boxColor = customMode.boxColorDelegate(customMode, part);
+                        break;
+                }
+            }
+
+            bool dull = false;
+
+            if (customMode == null)
+            {
+                dull = basicSettings.colorModeBoxDull;
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        dull = basicSettings.colorModeBoxDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        dull = customMode.staticSettings.colorModeBoxDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        dull = customMode.boxColorDullDelegate(customMode);
+                        break;
+                }
+            }
+
+            if (dull)
+            {
+                boxColor.r = boxColor.r / 2;
+                boxColor.g = boxColor.g / 2;
+                boxColor.b = boxColor.b / 2;
+            }
+
+            return boxColor;
+        }
+
         /// <summary>
         /// Renders a single part and adds all its children to the draw queue.
         /// Also adds its bounding box to the bounding box queue.
@@ -799,166 +911,8 @@ namespace VesselView
             }
             
             //get the appropriate colors
-            Color partColor = new Color();
-            Color boxColor = new Color();
-
-            if (customMode == null)
-                {
-                    if (!fill)  partColor = getPartColor(part, basicSettings.colorModeWire);
-                    else        partColor = getPartColor(part, basicSettings.colorModeFill);
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (!fill)  partColor = getPartColor(part, basicSettings.colorModeWire);
-                            else        partColor = getPartColor(part, basicSettings.colorModeFill); 
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (!fill)  partColor = getPartColor(part, customMode.staticSettings.colorModeWire);
-                            else        partColor = getPartColor(part, customMode.staticSettings.colorModeFill);  
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (fill)   partColor = customMode.fillColorDelegate(customMode,part);
-                            else partColor = customMode.wireColorDelegate(customMode, part);
-                            break;
-                    }
-                }
-
-            if (customMode == null)
-                {
-                    boxColor = getPartColor(part, basicSettings.colorModeBox);
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            boxColor = getPartColor(part, basicSettings.colorModeBox);
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            boxColor = getPartColor(part, customMode.staticSettings.colorModeBox);
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            boxColor = customMode.boxColorDelegate(customMode, part);
-                            break;
-                    }
-                }
-            
-            if (customMode == null)
-                {
-                    if (basicSettings.colorModeBoxDull) {
-                        boxColor.r = boxColor.r / 2;
-                        boxColor.g = boxColor.g / 2;
-                        boxColor.b = boxColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeBoxDull) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeBoxDull) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.boxColorDullDelegate(customMode)) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                    }
-                }
-            
-            if (fill) 
-            {
-                if (customMode == null)
-                {
-                    if (basicSettings.colorModeFillDull)
-                    {
-                        partColor.r = partColor.r / 2;
-                        partColor.g = partColor.g / 2;
-                        partColor.b = partColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeFillDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeFillDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.fillColorDullDelegate(customMode))
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                    }
-                }
-                
-            }
-            else 
-            {
-                
-                if (customMode == null)
-                {
-                    if (basicSettings.colorModeWireDull)
-                    {
-                        partColor.r = partColor.r / 2;
-                        partColor.g = partColor.g / 2;
-                        partColor.b = partColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeWireDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeWireDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.wireColorDullDelegate(customMode))
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                    }
-                }
-            }
+            Color partColor = GetPartColor(part, fill);
+            Color boxColor = GetBoxColor(part);
 
             //used to determine the part bounding box
             Vector3 minVec = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
