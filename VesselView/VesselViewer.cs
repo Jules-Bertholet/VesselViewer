@@ -25,6 +25,7 @@ namespace VesselView
         private Queue<ViewerConstants.RectColor> rectQueue = new Queue<ViewerConstants.RectColor>();
 
         private Matrix4x4 worldToScreen;
+        private Matrix4x4 worldToScreenFlattened;
 
         //gradient of colors for stage display
         private Color[] stageGradient;
@@ -207,10 +208,65 @@ namespace VesselView
             return angles;
         }
 
+        static readonly Matrix4x4 drawPlaneXZ = Matrix4x4.Rotate(Quaternion.Euler(0, 90, 0));
+        static readonly Matrix4x4 drawPlaneYZ = Matrix4x4.Rotate(Quaternion.Euler(90, 0, 0));
+        static readonly Matrix4x4 drawPlaneISO = Matrix4x4.Rotate(Quaternion.Euler(-15, 0, 0) * Quaternion.Euler(0, 30, 0));
+
+        Matrix4x4 GetDrawPlaneMatrix()
+		{
+            int drawPlane = 0;
+            if (customMode == null)
+            {
+                drawPlane = basicSettings.drawPlane;
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        drawPlane = basicSettings.drawPlane;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        drawPlane = customMode.staticSettings.drawPlane;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        drawPlane = customMode.drawPlaneDelegate(customMode);
+                        break;
+                }
+            }
+            switch (drawPlane)
+            {
+                case (int)ViewerConstants.PLANE.XZ:
+                    return drawPlaneXZ;
+                case (int)ViewerConstants.PLANE.YZ:
+                    return drawPlaneYZ;
+                case (int)ViewerConstants.PLANE.ISO:
+                    return drawPlaneISO;
+                case (int)ViewerConstants.PLANE.GRND:
+                    //transformTemp.transform.rotation = vessel.srfRelRotation;
+                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
+                    //transformTemp.transform.rotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
+                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix.inverse * meshTransMatrix;
+                    //transformTemp.transform.rotation = Quaternion.identity;
+                    //transformTemp.transform.Rotate(new Vector3(0, 0, 90));
+                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
+                    break;
+                case (int)ViewerConstants.PLANE.REAL:
+                    //transformTemp.transform.rotation = vessel.vesselTransform.rotation;
+                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
+                    break;
+            }
+
+            return Matrix4x4.identity;
+        }
+
         void UpdateTransformMatrix()
         {
             Vector3 rotationAngles = GetSpinAngles();
-            worldToScreen = Matrix4x4.Rotate(Quaternion.Euler(rotationAngles)) * FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+            Matrix4x4 drawPlaneMatrix = GetDrawPlaneMatrix();
+            worldToScreen = drawPlaneMatrix * Matrix4x4.Rotate(Quaternion.Euler(rotationAngles)) * FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+
+            worldToScreenFlattened = Matrix4x4.Scale(new Vector3(1, 1, 0.001f)) * worldToScreen;
         }
 
         /// <summary>
@@ -529,14 +585,14 @@ namespace VesselView
                         }
                     }
 
-                    Matrix4x4 transMatrix = genTransMatrix(part.partTransform, FlightGlobals.ActiveVessel, true);
+                    Matrix4x4 transMatrix = genTransMatrix(part.partTransform, true);
                     //if online, render exhaust
                     if (scale > 0.01f) 
                     {
                         if (!transformName.Equals(""))
                         {
                             Transform thrustTransform = part.FindModelTransform(transformName);
-                            transMatrix = genTransMatrix(thrustTransform, FlightGlobals.ActiveVessel, true);
+                            transMatrix = genTransMatrix(thrustTransform, true);
                             //default to magenta
                             Color color = Color.magenta;
                             //liquid fuel engines
@@ -659,7 +715,7 @@ namespace VesselView
             Vector3 groundBelow4 = new Vector3(-biggestCrossSection, -(float)altitude, biggestCrossSection);*/
             //Vector3 direction = groundBelow + groundN;
             //MonoBehaviour.print("COM>"+COM);
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
 
             groundBelow = transMatrix.MultiplyPoint3x4(groundBelow);
             groundBelow1 = transMatrix.MultiplyPoint3x4(groundBelow1);
@@ -755,7 +811,7 @@ namespace VesselView
         private void renderAxes(Matrix4x4 screenMatrix)
         {
 
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
 
             Vector3 up = transMatrix.MultiplyPoint3x4(Vector3.up * 10000);
             Vector3 down = transMatrix.MultiplyPoint3x4(Vector3.down * 10000);
@@ -786,7 +842,7 @@ namespace VesselView
 //            Vector3 COM = FlightGlobals.ActiveVessel.findLocalCenterOfMass();
             Vector3 COM = FlightGlobals.ActiveVessel.localCoM;
             //MonoBehaviour.print("COM>"+COM);
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
             //transMatrix = screenMatrix * transMatrix;
             //now render it
             COM = transMatrix.MultiplyPoint3x4(COM);
@@ -1023,7 +1079,7 @@ namespace VesselView
             {
                 if (renderer == null || renderer.gameObject.layer == TransparentFxLayer) continue;
 
-                MeshFilter meshF = renderer.gameObject.GetComponent<MeshFilter>();
+                MeshFilter meshF = renderer.GetComponent<MeshFilter>();
 
                 //only render those meshes that are active
                 //examples of inactive meshes seem to include
@@ -1033,7 +1089,7 @@ namespace VesselView
                 {
                     Mesh mesh = meshF.mesh;
                     //create the trans. matrix for this mesh (also update the bounds)
-                    Matrix4x4 transMatrix = worldToScreen * meshF.transform.localToWorldMatrix;
+                    Matrix4x4 transMatrix = worldToScreenFlattened * meshF.transform.localToWorldMatrix;
                     updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
@@ -1069,7 +1125,7 @@ namespace VesselView
                     smesh.BakeMesh(bakedMesh); // TODO: I'm sure this is super slow - can we cache the baked mesh if it's not animating?
                     //create the trans. matrix for this mesh (also update the bounds)
                     Matrix4x4 scalingTransform = Matrix4x4.Scale(new Vector3(1.0f / smesh.transform.lossyScale.x, 1.0f / smesh.transform.lossyScale.y, 1.0f / smesh.transform.lossyScale.z));
-                    Matrix4x4 transMatrix = worldToScreen * (smesh.transform.localToWorldMatrix * scalingTransform);
+                    Matrix4x4 transMatrix = worldToScreenFlattened * (smesh.transform.localToWorldMatrix * scalingTransform);
                     updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
@@ -1137,7 +1193,7 @@ namespace VesselView
                 scale += (scale / 100) * (40-timeAdd);
             }
             float sideScale = scale / 4f;
-            Matrix4x4 transMatrix = genTransMatrix(thrustTransform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(thrustTransform, true);
             Vector3 posStr = new Vector3(0, 0, offset);
             posStr = transMatrix.MultiplyPoint3x4(posStr);
             Vector3 posStr1 = new Vector3(-sideScale, 0, offset+sideScale);
@@ -1362,9 +1418,9 @@ namespace VesselView
         /// <param name="meshTrans">Mesh matrix</param>
         /// <param name="vessel">Active vessel</param>
         /// <returns></returns>
-        private Matrix4x4 genTransMatrix(Transform meshTrans, Vessel vessel, bool zeroFlatter)
+        private Matrix4x4 genTransMatrix(Transform meshTrans, bool zeroFlatter)
         {
-            return worldToScreen * meshTrans.localToWorldMatrix;
+            return (zeroFlatter ? worldToScreen : worldToScreenFlattened) * meshTrans.localToWorldMatrix;
         }
 
 #if false
@@ -1384,63 +1440,7 @@ namespace VesselView
             Vector3 extraRot = new Vector3(0, 0, 0);
             float speed = 0;
 
-            int drawPlane = 0;
-            if (customMode == null)
-                {
-                    drawPlane = basicSettings.drawPlane;
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            drawPlane = basicSettings.drawPlane;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            drawPlane = customMode.staticSettings.drawPlane;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            drawPlane = customMode.drawPlaneDelegate(customMode);
-                            break;
-                    }
-                }
-            switch (drawPlane)
-            {
-                case (int)ViewerConstants.PLANE.XY:
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.XZ:
-                    transformTemp.transform.Rotate(new Vector3(0, 90, 0));
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.YZ:
-                    transformTemp.transform.Rotate(new Vector3(90, 0, 0));
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.ISO:
-                    transformTemp.transform.Rotate(new Vector3(0, -30, 0));
-                    transformTemp.transform.Rotate(new Vector3(15, 0, 0));
-                    
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.GRND:
-                    transformTemp.transform.rotation = vessel.srfRelRotation;
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    transformTemp.transform.rotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix.inverse * meshTransMatrix;
-                    transformTemp.transform.rotation = Quaternion.identity;
-                    transformTemp.transform.Rotate(new Vector3(0, 0, 90));
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.REAL:
-                    transformTemp.transform.rotation = vessel.vesselTransform.rotation;
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-            }
+
             Matrix4x4 FLATTER;
             if (zeroFlatter)
             {
