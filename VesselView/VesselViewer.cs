@@ -243,18 +243,12 @@ namespace VesselView
                 case (int)ViewerConstants.PLANE.ISO:
                     return drawPlaneISO;
                 case (int)ViewerConstants.PLANE.GRND:
-                    //transformTemp.transform.rotation = vessel.srfRelRotation;
-                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    //transformTemp.transform.rotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
-                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix.inverse * meshTransMatrix;
-                    //transformTemp.transform.rotation = Quaternion.identity;
-                    //transformTemp.transform.Rotate(new Vector3(0, 0, 90));
-                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
+                    Vessel vessel = FlightGlobals.ActiveVessel;
+                    Quaternion invRotation = Quaternion.Inverse(vessel.srfRelRotation);
+                    Quaternion groundRotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
+                    return Matrix4x4.Rotate(invRotation * groundRotation * Quaternion.Euler(0, 0, -90));
                 case (int)ViewerConstants.PLANE.REAL:
-                    //transformTemp.transform.rotation = vessel.vesselTransform.rotation;
-                    //meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
+                    return FlightGlobals.ActiveVessel.vesselTransform.localToWorldMatrix;
             }
 
             return Matrix4x4.identity;
@@ -1422,38 +1416,6 @@ namespace VesselView
         {
             return (zeroFlatter ? worldToScreen : worldToScreenFlattened) * meshTrans.localToWorldMatrix;
         }
-
-#if false
-        private Matrix4x4 genTransMatrix(Matrix4x4 localToWorldMatrix, Vessel vessel, bool zeroFlatter)
-        {
-            return worldToScreen * localToWorldMatrix;
-
-            //extraRot
-
-            //the mesh transform matrix in local space (which is what we want)
-            //is essentialy its world transform matrix minus the transformations
-            //applied to the whole vessel.
-            Matrix4x4 meshTransMatrix = vessel.vesselTransform.worldToLocalMatrix * localToWorldMatrix;
-            //might also need some rotation to show a different side
-            transformTemp.transform.rotation = Quaternion.identity;
-            //NavBall stockNavBall = GameObject.Find("NavBall").GetComponent<NavBall>();
-            Vector3 extraRot = new Vector3(0, 0, 0);
-            float speed = 0;
-
-
-            Matrix4x4 FLATTER;
-            if (zeroFlatter)
-            {
-                FLATTER = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 1));
-            }
-            else {
-                FLATTER = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0.001f));
-            }
-            //scale z by zero to flatten and prevent culling
-            meshTransMatrix = FLATTER * meshTransMatrix;
-            return meshTransMatrix;
-    }
-#endif
 
         /// <summary>
         /// Calculate the ideal scale/offset.
