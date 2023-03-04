@@ -147,7 +147,71 @@ namespace VesselView
             //MonoBehaviour.print("VV draw call done");
         }
 
+        Vector3 GetSpinAngles()
+        {
+            Vector3 angles = Vector3.zero;
+            float speed = 0;
+            if (customMode == null)
+            {
+                speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        speed = ViewerConstants.SPIN_SPEED_VAL[customMode.staticSettings.spinSpeed];
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        speed = customMode.spinSpeedDelegate(customMode);
+                        break;
+                }
+            }
 
+            int spinAxis = 0;
+            if (customMode == null)
+            {
+                spinAxis = basicSettings.spinAxis;
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        spinAxis = basicSettings.spinAxis;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        spinAxis = customMode.staticSettings.spinAxis;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        spinAxis = customMode.spinAxisDelegate(customMode);
+                        break;
+                }
+            }
+            switch (spinAxis)
+            {
+                case (int)ViewerConstants.AXIS.X:
+                    angles.x += ((Time.time * speed) % 360);
+                    break;
+                case (int)ViewerConstants.AXIS.Y:
+                    angles.y += ((Time.time * speed) % 360);
+                    break;
+                case (int)ViewerConstants.AXIS.Z:
+                    angles.z += ((Time.time * speed) % 360);
+                    break;
+            }
+
+            return angles;
+        }
+
+        void UpdateTransformMatrix()
+        {
+            Vector3 rotationAngles = GetSpinAngles();
+            worldToScreen = Matrix4x4.Rotate(Quaternion.Euler(rotationAngles)) * FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+        }
 
         /// <summary>
         /// Start a new draw cycle.
@@ -160,7 +224,7 @@ namespace VesselView
             lastUpdate = Time.time;
             partQueue.Clear();
 
-            worldToScreen = FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+            UpdateTransformMatrix();
 
             //FlightGlobals.ActiveVessel = FlightGlobals.ActiveVessel;
             if (!FlightGlobals.ActiveVessel.isEVA)
@@ -1319,58 +1383,7 @@ namespace VesselView
             //NavBall stockNavBall = GameObject.Find("NavBall").GetComponent<NavBall>();
             Vector3 extraRot = new Vector3(0, 0, 0);
             float speed = 0;
-            if (customMode == null)
-                {
-                    speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            speed = ViewerConstants.SPIN_SPEED_VAL[customMode.staticSettings.spinSpeed];
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            speed = customMode.spinSpeedDelegate(customMode);
-                            break;
-                    }
-                }
 
-            int spinAxis = 0;
-            if (customMode == null)
-                {
-                    spinAxis = basicSettings.spinAxis;
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            spinAxis = basicSettings.spinAxis;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            spinAxis = customMode.staticSettings.spinAxis;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            spinAxis = customMode.spinAxisDelegate(customMode);
-                            break;
-                    }
-                }
-            switch (spinAxis) 
-            {
-                case (int)ViewerConstants.AXIS.X:
-                    extraRot.x += ((Time.time * speed) % 360);
-                    break;
-                case (int)ViewerConstants.AXIS.Y:
-                    extraRot.y += ((Time.time * speed) % 360);
-                    break;
-                case (int)ViewerConstants.AXIS.Z:
-                    extraRot.z += ((Time.time * speed) % 360);
-                    break;
-            }
             int drawPlane = 0;
             if (customMode == null)
                 {
