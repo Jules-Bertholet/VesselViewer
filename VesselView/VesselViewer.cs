@@ -316,7 +316,7 @@ namespace VesselView
                 GL.Viewport(new Rect(0, 0, renderTexture.width, renderTexture.height));
 
                 //clear the texture
-                GL.Clear(true, true, Color.black);
+                GL.Clear(true, true, Color.clear);
                 
                 //set up the screen position and scaling matrix
                 Matrix4x4 matrix = Matrix4x4.TRS(new Vector3(basicSettings.scrOffX, basicSettings.scrOffY, 0), Quaternion.identity, new Vector3(basicSettings.scaleFact, basicSettings.scaleFact, 1));
@@ -654,7 +654,7 @@ namespace VesselView
             {
                 ViewerConstants.RectColor next = rectQueue.Dequeue();
                 //this way invisible squares dont cover up visible ones
-                if(!next.color.Equals(Color.black)) renderRect(next.rect, screenMatrix, next.color);
+                if(next.color.a != 0) renderRect(next.rect, screenMatrix, next.color);
             }
 
         }
@@ -1087,12 +1087,12 @@ namespace VesselView
                     updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!fillPartColor.Equals(Color.black))
+                    if (fillPartColor.a != 0)
                     {
                         GL.wireframe = false;
                         renderMesh(mesh, transMatrix, fillPartColor);
                     }
-                    if (!wirePartColor.Equals(Color.black))
+                    if (wirePartColor.a != 0)
                     {
                         GL.wireframe = true;
                         renderMesh(mesh, transMatrix, wirePartColor);
@@ -1123,12 +1123,12 @@ namespace VesselView
                     updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!fillPartColor.Equals(Color.black))
+                    if (fillPartColor.a != 0)
                     {
                         GL.wireframe = false;
                         renderMesh(bakedMesh, transMatrix, fillPartColor);
                     }
-                    if (!wirePartColor.Equals(Color.black))
+                    if (wirePartColor.a != 0)
                     {
                         GL.wireframe = true;
                         renderMesh(bakedMesh, transMatrix, wirePartColor);
@@ -1702,7 +1702,7 @@ namespace VesselView
                     }
                     return genFractColor(1f-stall);
                 case (int)ViewerConstants.COLORMODE.HIDE:
-                    return Color.black;
+                    return Color.clear;
                 default:
                     return Color.white;
             }
