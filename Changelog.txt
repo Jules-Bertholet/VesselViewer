@@ -68,7 +68,7 @@ ChangeLog
 		fix duplicated custom menus
 		handle rich text tags in part selector
 
-0.8.7
+0.8.9
 	Thanks to @JonnyOThan for this:
 		Optimize VV rendering (much faster)
 		Remove JSIPartUtilities dependency
