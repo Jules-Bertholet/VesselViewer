@@ -4,6 +4,8 @@ using System.Reflection;
 using UnityEngine;
 using KSP.UI.Screens;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection.Emit;
 
 namespace VesselView
 {
@@ -15,9 +17,6 @@ namespace VesselView
         private Vector3 minVecG = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         private Vector3 maxVecG = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-        //used for temp transform because matrices are scary
-        private GameObject transformTemp = new GameObject();
-
         //time of last update
         private float lastUpdate = 0.0f;
 
@@ -25,6 +24,8 @@ namespace VesselView
         private Queue<Part> partQueue = new Queue<Part>();
         private Queue<ViewerConstants.RectColor> rectQueue = new Queue<ViewerConstants.RectColor>();
 
+        private Matrix4x4 worldToScreen;
+        private Matrix4x4 worldToScreenFlattened;
 
         //gradient of colors for stage display
         private Color[] stageGradient;
@@ -51,8 +52,8 @@ namespace VesselView
         public VesselViewer()
         {
             Debug.Log("VesselViewer.cs, creating basicSettings");
-          
-            lineMaterial = JSIPartUtilities.JUtil.DrawLineMaterial();
+            // TODO: it would probably be better if we had a shader that worked with GL.Color
+            lineMaterial = new Material(Shader.Find("Unlit/Color"));
             basicSettings = new ViewerSettings();
             activeInstances.Add(this);
         }
@@ -147,7 +148,120 @@ namespace VesselView
             //MonoBehaviour.print("VV draw call done");
         }
 
+        Vector3 GetSpinAngles()
+        {
+            Vector3 angles = Vector3.zero;
+            float speed = 0;
+            if (customMode == null)
+            {
+                speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        speed = ViewerConstants.SPIN_SPEED_VAL[customMode.staticSettings.spinSpeed];
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        speed = customMode.spinSpeedDelegate(customMode);
+                        break;
+                }
+            }
 
+            int spinAxis = 0;
+            if (customMode == null)
+            {
+                spinAxis = basicSettings.spinAxis;
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        spinAxis = basicSettings.spinAxis;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        spinAxis = customMode.staticSettings.spinAxis;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        spinAxis = customMode.spinAxisDelegate(customMode);
+                        break;
+                }
+            }
+            switch (spinAxis)
+            {
+                case (int)ViewerConstants.AXIS.X:
+                    angles.x += ((Time.time * speed) % 360);
+                    break;
+                case (int)ViewerConstants.AXIS.Y:
+                    angles.y += ((Time.time * speed) % 360);
+                    break;
+                case (int)ViewerConstants.AXIS.Z:
+                    angles.z += ((Time.time * speed) % 360);
+                    break;
+            }
+
+            return angles;
+        }
+
+        static readonly Matrix4x4 drawPlaneXZ = Matrix4x4.Rotate(Quaternion.Euler(0, 90, 0));
+        static readonly Matrix4x4 drawPlaneYZ = Matrix4x4.Rotate(Quaternion.Euler(90, 0, 0));
+        static readonly Matrix4x4 drawPlaneISO = Matrix4x4.Rotate(Quaternion.Euler(-15, 0, 0) * Quaternion.Euler(0, 30, 0));
+
+        Matrix4x4 GetDrawPlaneMatrix()
+		{
+            int drawPlane = 0;
+            if (customMode == null)
+            {
+                drawPlane = basicSettings.drawPlane;
+            }
+            else
+            {
+                switch (customMode.OrientationOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        drawPlane = basicSettings.drawPlane;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        drawPlane = customMode.staticSettings.drawPlane;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        drawPlane = customMode.drawPlaneDelegate(customMode);
+                        break;
+                }
+            }
+            switch (drawPlane)
+            {
+                case (int)ViewerConstants.PLANE.XZ:
+                    return drawPlaneXZ;
+                case (int)ViewerConstants.PLANE.YZ:
+                    return drawPlaneYZ;
+                case (int)ViewerConstants.PLANE.ISO:
+                    return drawPlaneISO;
+                case (int)ViewerConstants.PLANE.GRND:
+                    Vessel vessel = FlightGlobals.ActiveVessel;
+                    Quaternion invRotation = Quaternion.Inverse(vessel.srfRelRotation);
+                    Quaternion groundRotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
+                    return Matrix4x4.Rotate(invRotation * groundRotation * Quaternion.Euler(0, 0, -90));
+                case (int)ViewerConstants.PLANE.REAL:
+                    return FlightGlobals.ActiveVessel.vesselTransform.localToWorldMatrix;
+            }
+
+            return Matrix4x4.identity;
+        }
+
+        void UpdateTransformMatrix()
+        {
+            Vector3 rotationAngles = GetSpinAngles();
+            Matrix4x4 drawPlaneMatrix = GetDrawPlaneMatrix();
+            worldToScreen = drawPlaneMatrix * Matrix4x4.Rotate(Quaternion.Euler(rotationAngles)) * FlightGlobals.ActiveVessel.transform.worldToLocalMatrix;
+
+            worldToScreenFlattened = Matrix4x4.Scale(new Vector3(1, 1, 0.001f)) * worldToScreen;
+        }
 
         /// <summary>
         /// Start a new draw cycle.
@@ -159,6 +273,9 @@ namespace VesselView
             maxVecG = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             lastUpdate = Time.time;
             partQueue.Clear();
+
+            UpdateTransformMatrix();
+
             //FlightGlobals.ActiveVessel = FlightGlobals.ActiveVessel;
             if (!FlightGlobals.ActiveVessel.isEVA)
             {
@@ -199,7 +316,7 @@ namespace VesselView
                 GL.Viewport(new Rect(0, 0, renderTexture.width, renderTexture.height));
 
                 //clear the texture
-                GL.Clear(true, true, Color.black);
+                GL.Clear(true, true, Color.clear);
                 
                 //set up the screen position and scaling matrix
                 Matrix4x4 matrix = Matrix4x4.TRS(new Vector3(basicSettings.scrOffX, basicSettings.scrOffY, 0), Quaternion.identity, new Vector3(basicSettings.scaleFact, basicSettings.scaleFact, 1));
@@ -211,29 +328,10 @@ namespace VesselView
                     Part next = partQueue.Dequeue();
                     if (next != null)
                     {
-                        renderPart(next, matrix, true);
+                        renderPart(next, matrix);
                     }
                 }
-                GL.Clear(true, false, Color.black);
-                if (partQueue.Count == 0)
-                {
-                    if (!FlightGlobals.ActiveVessel.isEVA)
-                    {
-                        partQueue.Enqueue(FlightGlobals.ActiveVessel.rootPart);
-                    }
-                }
-                //lineMaterial.SetPass(1);
-                //turn on wireframe, since triangles would get filled othershipwise
                 GL.wireframe = true;
-                //now render each part (assumes root part is in the queue)
-                while (partQueue.Count > 0)
-                {
-                    Part next = partQueue.Dequeue();
-                    if (next != null)
-                    {
-                        renderPart(next, matrix, false);
-                    }
-                }
                 //now render engine exhaust indicators
                 if (customMode == null)
                 {
@@ -481,14 +579,14 @@ namespace VesselView
                         }
                     }
 
-                    Matrix4x4 transMatrix = genTransMatrix(part.partTransform, FlightGlobals.ActiveVessel, true);
+                    Matrix4x4 transMatrix = genTransMatrix(part.partTransform, true);
                     //if online, render exhaust
                     if (scale > 0.01f) 
                     {
                         if (!transformName.Equals(""))
                         {
                             Transform thrustTransform = part.FindModelTransform(transformName);
-                            transMatrix = genTransMatrix(thrustTransform, FlightGlobals.ActiveVessel, true);
+                            transMatrix = genTransMatrix(thrustTransform, true);
                             //default to magenta
                             Color color = Color.magenta;
                             //liquid fuel engines
@@ -556,7 +654,7 @@ namespace VesselView
             {
                 ViewerConstants.RectColor next = rectQueue.Dequeue();
                 //this way invisible squares dont cover up visible ones
-                if(!next.color.Equals(Color.black)) renderRect(next.rect, screenMatrix, next.color);
+                if(next.color.a != 0) renderRect(next.rect, screenMatrix, next.color);
             }
 
         }
@@ -611,7 +709,7 @@ namespace VesselView
             Vector3 groundBelow4 = new Vector3(-biggestCrossSection, -(float)altitude, biggestCrossSection);*/
             //Vector3 direction = groundBelow + groundN;
             //MonoBehaviour.print("COM>"+COM);
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
 
             groundBelow = transMatrix.MultiplyPoint3x4(groundBelow);
             groundBelow1 = transMatrix.MultiplyPoint3x4(groundBelow1);
@@ -707,7 +805,7 @@ namespace VesselView
         private void renderAxes(Matrix4x4 screenMatrix)
         {
 
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
 
             Vector3 up = transMatrix.MultiplyPoint3x4(Vector3.up * 10000);
             Vector3 down = transMatrix.MultiplyPoint3x4(Vector3.down * 10000);
@@ -738,7 +836,7 @@ namespace VesselView
 //            Vector3 COM = FlightGlobals.ActiveVessel.findLocalCenterOfMass();
             Vector3 COM = FlightGlobals.ActiveVessel.localCoM;
             //MonoBehaviour.print("COM>"+COM);
-            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(FlightGlobals.ActiveVessel.rootPart.transform, true);
             //transMatrix = screenMatrix * transMatrix;
             //now render it
             COM = transMatrix.MultiplyPoint3x4(COM);
@@ -777,13 +875,173 @@ namespace VesselView
             renderIcon(new Rect(-div + MOI.x, -div + MOI.y, 2 * div, 2 * div), screenMatrix, Color.yellow, (int)ViewerConstants.ICONS.SQUARE_DIAMOND);
         }
 */
+
+        public static Func<S, T> CreateGetter<S, T>(FieldInfo field)
+        {
+            string methodName = field.ReflectedType.FullName + ".get_" + field.Name;
+            DynamicMethod setterMethod = new DynamicMethod(methodName, typeof(T), new Type[1] { typeof(S) }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
+            if (field.IsStatic)
+            {
+                gen.Emit(OpCodes.Ldsfld, field);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Ldfld, field);
+            }
+            gen.Emit(OpCodes.Ret);
+            return (Func<S, T>)setterMethod.CreateDelegate(typeof(Func<S, T>));
+        }
+
+        public static Action<S, T> CreateSetter<S, T>(FieldInfo field)
+        {
+            string methodName = field.ReflectedType.FullName + ".set_" + field.Name;
+            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(S), typeof(T) }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
+            if (field.IsStatic)
+            {
+                gen.Emit(OpCodes.Ldarg_1);
+                gen.Emit(OpCodes.Stsfld, field);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Ldarg_1);
+                gen.Emit(OpCodes.Stfld, field);
+            }
+            gen.Emit(OpCodes.Ret);
+            return (Action<S, T>)setterMethod.CreateDelegate(typeof(Action<S, T>));
+        }
+
+        // This could all be simpler and faster if we used a publicizer instead
+        static FieldInfo x_Part_modelMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo x_Part_modelSkinnedMeshRenderersCache_FieldInfo = typeof(Part).GetField("modelSkinnedMeshRenderersCache", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        static Func<Part, List<MeshRenderer>> Part_GetMeshRenderers = CreateGetter<Part, List<MeshRenderer>>(x_Part_modelMeshRenderersCache_FieldInfo);
+        static Func<Part, List<SkinnedMeshRenderer>> Part_GetSkinnedMeshRenderers = CreateGetter<Part, List<SkinnedMeshRenderer>>(x_Part_modelSkinnedMeshRenderersCache_FieldInfo);
+        static Action<Part, List<MeshRenderer>> Part_SetMeshRenderers = CreateSetter<Part, List<MeshRenderer>>(x_Part_modelMeshRenderersCache_FieldInfo);
+        static Action<Part, List<SkinnedMeshRenderer>> Part_SetSkinnedMeshRenderers = CreateSetter<Part, List<SkinnedMeshRenderer>>(x_Part_modelSkinnedMeshRenderersCache_FieldInfo);
+
+        Color GetPartColor(Part part, bool fill)
+        {
+            Color partColor = new Color();
+
+            if (customMode == null)
+            {
+                partColor = getPartColor(part, fill ? basicSettings.colorModeFill : basicSettings.colorModeWire);
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        partColor = getPartColor(part, fill ? basicSettings.colorModeFill : basicSettings.colorModeWire);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        partColor = getPartColor(part, fill ? customMode.staticSettings.colorModeFill : customMode.staticSettings.colorModeWire);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        partColor = fill ? customMode.fillColorDelegate(customMode, part) : customMode.wireColorDelegate(customMode, part);
+                        break;
+                }
+            }
+
+            bool dull = false;
+
+            if (customMode == null)
+            {
+                dull = fill ? basicSettings.colorModeFillDull : basicSettings.colorModeWireDull;
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        dull = fill ? basicSettings.colorModeFillDull : basicSettings.colorModeWireDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        dull = fill ? customMode.staticSettings.colorModeFillDull : customMode.staticSettings.colorModeWireDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        dull = fill ? customMode.fillColorDullDelegate(customMode) : customMode.wireColorDullDelegate(customMode);
+                        break;
+                }
+            }
+
+            if (dull)
+            {
+                partColor.r /= 2;
+                partColor.g /= 2;
+                partColor.b /= 2;
+            }
+
+            return partColor;
+        }
+
+        Color GetBoxColor(Part part)
+        {
+            Color boxColor = new Color();
+
+            if (customMode == null)
+            {
+                boxColor = getPartColor(part, basicSettings.colorModeBox);
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        boxColor = getPartColor(part, basicSettings.colorModeBox);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        boxColor = getPartColor(part, customMode.staticSettings.colorModeBox);
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        boxColor = customMode.boxColorDelegate(customMode, part);
+                        break;
+                }
+            }
+
+            bool dull = false;
+
+            if (customMode == null)
+            {
+                dull = basicSettings.colorModeBoxDull;
+            }
+            else
+            {
+                switch (customMode.ColorModeOverride)
+                {
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
+                        dull = basicSettings.colorModeBoxDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
+                        dull = customMode.staticSettings.colorModeBoxDull;
+                        break;
+                    case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
+                        dull = customMode.boxColorDullDelegate(customMode);
+                        break;
+                }
+            }
+
+            if (dull)
+            {
+                boxColor.r = boxColor.r / 2;
+                boxColor.g = boxColor.g / 2;
+                boxColor.b = boxColor.b / 2;
+            }
+
+            return boxColor;
+        }
+
         /// <summary>
         /// Renders a single part and adds all its children to the draw queue.
         /// Also adds its bounding box to the bounding box queue.
         /// </summary>
         /// <param name="part">Part to render</param>
         /// <param name="scrnMatrix">Screen transform</param>
-        private void renderPart(Part part, Matrix4x4 scrnMatrix, bool fill)
+        private void renderPart(Part part, Matrix4x4 scrnMatrix)
         {
             //first off, add all the parts children to the queue
             foreach (Part child in part.children)
@@ -795,177 +1053,27 @@ namespace VesselView
             }
             
             //get the appropriate colors
-            Color partColor = new Color();
-            Color boxColor = new Color();
-
-            if (customMode == null)
-                {
-                    if (!fill)  partColor = getPartColor(part, basicSettings.colorModeWire);
-                    else        partColor = getPartColor(part, basicSettings.colorModeFill);
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (!fill)  partColor = getPartColor(part, basicSettings.colorModeWire);
-                            else        partColor = getPartColor(part, basicSettings.colorModeFill); 
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (!fill)  partColor = getPartColor(part, customMode.staticSettings.colorModeWire);
-                            else        partColor = getPartColor(part, customMode.staticSettings.colorModeFill);  
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (fill)   partColor = customMode.fillColorDelegate(customMode,part);
-                            else partColor = customMode.wireColorDelegate(customMode, part);
-                            break;
-                    }
-                }
-
-            if (customMode == null)
-                {
-                    boxColor = getPartColor(part, basicSettings.colorModeBox);
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            boxColor = getPartColor(part, basicSettings.colorModeBox);
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            boxColor = getPartColor(part, customMode.staticSettings.colorModeBox);
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            boxColor = customMode.boxColorDelegate(customMode, part);
-                            break;
-                    }
-                }
-            
-            if (customMode == null)
-                {
-                    if (basicSettings.colorModeBoxDull) {
-                        boxColor.r = boxColor.r / 2;
-                        boxColor.g = boxColor.g / 2;
-                        boxColor.b = boxColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeBoxDull) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeBoxDull) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.boxColorDullDelegate(customMode)) {
-                                boxColor.r = boxColor.r / 2;
-                                boxColor.g = boxColor.g / 2;
-                                boxColor.b = boxColor.b / 2;
-                            }break;
-                    }
-                }
-            
-            if (fill) 
-            {
-                if (customMode == null)
-                {
-                    if (basicSettings.colorModeFillDull)
-                    {
-                        partColor.r = partColor.r / 2;
-                        partColor.g = partColor.g / 2;
-                        partColor.b = partColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeFillDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeFillDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.fillColorDullDelegate(customMode))
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            }break;
-                    }
-                }
-                
-            }
-            else 
-            {
-                
-                if (customMode == null)
-                {
-                    if (basicSettings.colorModeWireDull)
-                    {
-                        partColor.r = partColor.r / 2;
-                        partColor.g = partColor.g / 2;
-                        partColor.b = partColor.b / 2;
-                    }
-                }
-                else
-                {
-                    switch (customMode.ColorModeOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            if (basicSettings.colorModeWireDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            if (customMode.staticSettings.colorModeWireDull)
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            if (customMode.wireColorDullDelegate(customMode))
-                            {
-                                partColor.r = partColor.r / 2;
-                                partColor.g = partColor.g / 2;
-                                partColor.b = partColor.b / 2;
-                            } break;
-                    }
-                }
-            }
+            Color fillPartColor = GetPartColor(part, true);
+            Color wirePartColor = GetPartColor(part, false);
+            Color boxColor = GetBoxColor(part);
 
             //used to determine the part bounding box
             Vector3 minVec = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 maxVec = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
             //now we need to get all meshes in the part
-            foreach (MeshRenderer renderer in part.transform.GetComponentsInChildren<MeshRenderer>())
+            var meshRenderers = Part_GetMeshRenderers(part);
+            if (meshRenderers == null)
             {
-                if (renderer.gameObject.layer == TransparentFxLayer) continue;
+                meshRenderers = part.FindModelComponents<MeshRenderer>();
+                Part_SetMeshRenderers(part, meshRenderers);
+            }
 
-                MeshFilter meshF = renderer.gameObject.GetComponent<MeshFilter>();
+            foreach (MeshRenderer renderer in meshRenderers)
+            {
+                if (renderer == null || renderer.gameObject.layer == TransparentFxLayer) continue;
+
+                MeshFilter meshF = renderer.GetComponent<MeshFilter>();
 
                 //only render those meshes that are active
                 //examples of inactive meshes seem to include
@@ -975,34 +1083,56 @@ namespace VesselView
                 {
                     Mesh mesh = meshF.mesh;
                     //create the trans. matrix for this mesh (also update the bounds)
-                    Matrix4x4 transMatrix = genTransMatrix(meshF.transform, FlightGlobals.ActiveVessel, false);
+                    Matrix4x4 transMatrix = worldToScreenFlattened * meshF.transform.localToWorldMatrix;
                     updateMinMax(mesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!partColor.Equals(Color.black))
-                        //renderMesh(mesh, transMatrix, partColor);
-                        renderMesh(mesh.triangles, mesh.vertices, transMatrix, partColor);
+                    if (fillPartColor.a != 0)
+                    {
+                        GL.wireframe = false;
+                        renderMesh(mesh, transMatrix, fillPartColor);
+                    }
+                    if (wirePartColor.a != 0)
+                    {
+                        GL.wireframe = true;
+                        renderMesh(mesh, transMatrix, wirePartColor);
+                    }
                 }
             }
 
-            foreach (SkinnedMeshRenderer smesh in part.FindModelComponents<SkinnedMeshRenderer>())
+
+            var skinnedMeshRenderers = Part_GetSkinnedMeshRenderers(part);
+            if (skinnedMeshRenderers == null)
             {
-                if (smesh.gameObject.layer == TransparentFxLayer) continue;
+                skinnedMeshRenderers = part.FindModelComponents<SkinnedMeshRenderer>();
+                Part_SetSkinnedMeshRenderers(part, skinnedMeshRenderers);
+            }
+
+            foreach (SkinnedMeshRenderer smesh in skinnedMeshRenderers)
+            {
+                if (smesh == null || smesh.gameObject.layer == TransparentFxLayer) continue;
 
                 if (smesh.gameObject.activeInHierarchy)
                 {
                     //skinned meshes seem to be not nearly as conveniently simple
                     //luckily, I can apparently ask them to do all the work for me
-                    smesh.BakeMesh(bakedMesh);
+                    smesh.BakeMesh(bakedMesh); // TODO: I'm sure this is super slow - can we cache the baked mesh if it's not animating?
                     //create the trans. matrix for this mesh (also update the bounds)
                     Matrix4x4 scalingTransform = Matrix4x4.Scale(new Vector3(1.0f / smesh.transform.lossyScale.x, 1.0f / smesh.transform.lossyScale.y, 1.0f / smesh.transform.lossyScale.z));
-                    Matrix4x4 transMatrix = genTransMatrix(smesh.transform.localToWorldMatrix * scalingTransform, FlightGlobals.ActiveVessel, false);
-					updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
+                    Matrix4x4 transMatrix = worldToScreenFlattened * (smesh.transform.localToWorldMatrix * scalingTransform);
+                    updateMinMax(bakedMesh.bounds, transMatrix, ref minVec, ref maxVec);
                     transMatrix = scrnMatrix * transMatrix;
                     //now render it
-                    if (!partColor.Equals(Color.black))
-                        //renderMesh(bakedMesh, transMatrix, partColor);
-                        renderMesh(bakedMesh.triangles, bakedMesh.vertices, transMatrix, partColor);
+                    if (fillPartColor.a != 0)
+                    {
+                        GL.wireframe = false;
+                        renderMesh(bakedMesh, transMatrix, fillPartColor);
+                    }
+                    if (wirePartColor.a != 0)
+                    {
+                        GL.wireframe = true;
+                        renderMesh(bakedMesh, transMatrix, wirePartColor);
+                    }
                 }
             }
 
@@ -1021,13 +1151,9 @@ namespace VesselView
                 if (maxVecG.y < maxVec.y) maxVecG.y = maxVec.y;
                 if (maxVecG.z < maxVec.z) maxVecG.z = maxVec.z;
             }
-            if (!fill) 
-            {
-                //and draw a box around the part (later)
-                rectQueue.Enqueue(new ViewerConstants.RectColor(new Rect((minVec.x), (minVec.y), (maxVec.x - minVec.x), (maxVec.y - minVec.y)), boxColor));
-            }
             
-            
+            //and draw a box around the part (later)
+            rectQueue.Enqueue(new ViewerConstants.RectColor(new Rect((minVec.x), (minVec.y), (maxVec.x - minVec.x), (maxVec.y - minVec.y)), boxColor));
         }
 
         /// <summary>
@@ -1040,40 +1166,12 @@ namespace VesselView
             //setup GL
             GL.PushMatrix();
             GL.MultMatrix(transMatrix);
-            GL.Begin(GL.TRIANGLES);
-            GL.Color(color);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             //and draw the triangles
             //TODO: Maybe it doesnt have to be done in immediate mode?
             //Unity GL doesnt seem to expose much, though.
             Graphics.DrawMeshNow(mesh, transMatrix);
-            GL.End();
-            GL.PopMatrix();
-        }
-
-        /// <summary>
-        /// Renders a mesh.
-        /// </summary>
-        /// <param name="triangles">Mesh triangles.</param>
-        /// <param name="vertices">Mesh vertices.</param>
-        /// <param name="transMatrix">Mesh transform.</param>
-        /// <param name="color">Color.</param>
-        private void renderMesh(int[] triangles, Vector3[] vertices, Matrix4x4 transMatrix, Color color)
-        {
-            //setup GL
-            GL.PushMatrix();
-            GL.MultMatrix(transMatrix);
-            GL.Begin(GL.TRIANGLES);
-            GL.Color(color);
-            //and draw the triangles
-            //TODO: Maybe it doesnt have to be done in immediate mode?
-            //Unity GL doesnt seem to expose much, though.
-            for (int i = 0; i < triangles.Length; i += 3)
-            {
-                GL.Vertex(vertices[triangles[i]]);
-                GL.Vertex(vertices[triangles[i + 1]]);
-                GL.Vertex(vertices[triangles[i + 2]]);
-            }
-            GL.End();
             GL.PopMatrix();
         }
 
@@ -1089,7 +1187,7 @@ namespace VesselView
                 scale += (scale / 100) * (40-timeAdd);
             }
             float sideScale = scale / 4f;
-            Matrix4x4 transMatrix = genTransMatrix(thrustTransform, FlightGlobals.ActiveVessel, true);
+            Matrix4x4 transMatrix = genTransMatrix(thrustTransform, true);
             Vector3 posStr = new Vector3(0, 0, offset);
             posStr = transMatrix.MultiplyPoint3x4(posStr);
             Vector3 posStr1 = new Vector3(-sideScale, 0, offset+sideScale);
@@ -1130,6 +1228,8 @@ namespace VesselView
         {
             GL.Begin(GL.QUADS);
             GL.Color(Color.black);
+            lineMaterial.color = Color.black;
+            lineMaterial.SetPass(0);
             GL.wireframe = false;
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMin, 0.1f)));
             GL.Vertex(screenMatrix.MultiplyPoint3x4(new Vector3(rect.xMin, rect.yMax, 0.1f)));
@@ -1141,6 +1241,8 @@ namespace VesselView
             //setup GL, then render the lines
             GL.Begin(GL.LINES);
             GL.Color(color);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             float xMid = ((rect.xMax - rect.xMin) / 2) + rect.xMin;
             float yMid = ((rect.yMax - rect.yMin) / 2) + rect.yMin;
             float xOneFourth = ((xMid - rect.xMin) / 2) + rect.xMin;
@@ -1255,6 +1357,8 @@ namespace VesselView
             //setup GL, then render the lines
             GL.Begin(GL.LINES);
             GL.Color(color);
+            lineMaterial.color = color;
+            lineMaterial.SetPass(0);
             renderLine(rect.xMin, rect.yMin, rect.xMax, rect.yMin, screenMatrix);
             renderLine(rect.xMax, rect.yMin, rect.xMax, rect.yMax, screenMatrix);
             renderLine(rect.xMax, rect.yMax, rect.xMin, rect.yMax, screenMatrix);
@@ -1288,28 +1392,18 @@ namespace VesselView
         /// <param name="maxVec">Reference to maximums-so-far vector</param>
         private void updateMinMax(Bounds meshBounds, Matrix4x4 transMatrix, ref Vector3 minVec, ref Vector3 maxVec)
         {
-            //simplest way to do this is to take the corner points of the bound. box
-            //multiply them by the transformation matrix, and get the mins/maxes from the results
-            //its a bit of math done on the CPU but insignificant compared to the number of vertices
-            Vector3[] vertices = new Vector3[8];
-            vertices[0] = new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.min.z);
-            vertices[1] = new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.min.z);
-            vertices[2] = new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.min.z);
-            vertices[3] = new Vector3(meshBounds.min.x, meshBounds.min.y, meshBounds.max.z);
-            vertices[4] = new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.min.z);
-            vertices[5] = new Vector3(meshBounds.max.x, meshBounds.min.y, meshBounds.max.z);
-            vertices[6] = new Vector3(meshBounds.min.x, meshBounds.max.y, meshBounds.max.z);
-            vertices[7] = new Vector3(meshBounds.max.x, meshBounds.max.y, meshBounds.max.z);
-            foreach (Vector3 v1 in vertices)
-            {
-                Vector3 v = transMatrix.MultiplyPoint3x4(v1);
-                if (v.x < minVec.x) minVec.x = v.x;
-                if (v.y < minVec.y) minVec.y = v.y;
-                if (v.z < minVec.z) minVec.z = v.z;
-                if (v.x > maxVec.x) maxVec.x = v.x;
-                if (v.y > maxVec.y) maxVec.y = v.y;
-                if (v.z > maxVec.z) maxVec.z = v.z;
-            }
+            Vector3 v1 = new Vector3(transMatrix.m00, transMatrix.m10, transMatrix.m20) * meshBounds.extents.x;
+            Vector3 v2 = new Vector3(transMatrix.m01, transMatrix.m11, transMatrix.m21) * meshBounds.extents.y;
+            Vector3 v3 = new Vector3(transMatrix.m02, transMatrix.m12, transMatrix.m22) * meshBounds.extents.z;
+
+            Vector3 newCenter = transMatrix.MultiplyPoint(meshBounds.center);
+            Vector3 newExtents = new Vector3(
+                Mathf.Abs(v1.x) + Mathf.Abs(v2.x) + Mathf.Abs(v3.x),
+                Mathf.Abs(v1.y) + Mathf.Abs(v2.y) + Mathf.Abs(v3.y),
+                Mathf.Abs(v1.z) + Mathf.Abs(v2.z) + Mathf.Abs(v3.z));
+
+            minVec = Vector3.Min(minVec, newCenter - newExtents);
+            maxVec = Vector3.Max(maxVec, newCenter + newExtents);
         }
 
         /// <summary>
@@ -1318,144 +1412,9 @@ namespace VesselView
         /// <param name="meshTrans">Mesh matrix</param>
         /// <param name="vessel">Active vessel</param>
         /// <returns></returns>
-        private Matrix4x4 genTransMatrix(Transform meshTrans, Vessel vessel, bool zeroFlatter)
+        private Matrix4x4 genTransMatrix(Transform meshTrans, bool zeroFlatter)
         {
-            return genTransMatrix(meshTrans.localToWorldMatrix, vessel, zeroFlatter);
-        }
-
-        private Matrix4x4 genTransMatrix(Matrix4x4 localToWorldMatrix, Vessel vessel, bool zeroFlatter)
-        {
-            //extraRot
-
-            //the mesh transform matrix in local space (which is what we want)
-            //is essentialy its world transform matrix minus the transformations
-            //applied to the whole vessel.
-            Matrix4x4 meshTransMatrix = vessel.vesselTransform.localToWorldMatrix.inverse * localToWorldMatrix;
-            //might also need some rotation to show a different side
-            transformTemp.transform.rotation = Quaternion.identity;
-            //NavBall stockNavBall = GameObject.Find("NavBall").GetComponent<NavBall>();
-            Vector3 extraRot = new Vector3(0, 0, 0);
-            float speed = 0;
-            if (customMode == null)
-                {
-                    speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            speed = ViewerConstants.SPIN_SPEED_VAL[basicSettings.spinSpeed];
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            speed = ViewerConstants.SPIN_SPEED_VAL[customMode.staticSettings.spinSpeed];
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            speed = customMode.spinSpeedDelegate(customMode);
-                            break;
-                    }
-                }
-
-            int spinAxis = 0;
-            if (customMode == null)
-                {
-                    spinAxis = basicSettings.spinAxis;
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            spinAxis = basicSettings.spinAxis;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            spinAxis = customMode.staticSettings.spinAxis;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            spinAxis = customMode.spinAxisDelegate(customMode);
-                            break;
-                    }
-                }
-            switch (spinAxis) 
-            {
-                case (int)ViewerConstants.AXIS.X:
-                    extraRot.x += ((Time.time * speed) % 360);
-                    break;
-                case (int)ViewerConstants.AXIS.Y:
-                    extraRot.y += ((Time.time * speed) % 360);
-                    break;
-                case (int)ViewerConstants.AXIS.Z:
-                    extraRot.z += ((Time.time * speed) % 360);
-                    break;
-            }
-            int drawPlane = 0;
-            if (customMode == null)
-                {
-                    drawPlane = basicSettings.drawPlane;
-                }
-                else
-                {
-                    switch (customMode.OrientationOverride)
-                    {
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.AS_BASIC:
-                            drawPlane = basicSettings.drawPlane;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.STATIC:
-                            drawPlane = customMode.staticSettings.drawPlane;
-                            break;
-                        case (int)CustomModeSettings.OVERRIDE_TYPES.FUNCTION:
-                            drawPlane = customMode.drawPlaneDelegate(customMode);
-                            break;
-                    }
-                }
-            switch (drawPlane)
-            {
-                case (int)ViewerConstants.PLANE.XY:
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.XZ:
-                    transformTemp.transform.Rotate(new Vector3(0, 90, 0));
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.YZ:
-                    transformTemp.transform.Rotate(new Vector3(90, 0, 0));
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.ISO:
-                    transformTemp.transform.Rotate(new Vector3(0, -30, 0));
-                    transformTemp.transform.Rotate(new Vector3(15, 0, 0));
-                    
-                    transformTemp.transform.Rotate(extraRot);
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.GRND:
-                    transformTemp.transform.rotation = vessel.srfRelRotation;
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    transformTemp.transform.rotation = Quaternion.FromToRotation(vessel.mainBody.GetSurfaceNVector(0, 0), vessel.mainBody.GetSurfaceNVector(vessel.latitude, vessel.longitude));
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix.inverse * meshTransMatrix;
-                    transformTemp.transform.rotation = Quaternion.identity;
-                    transformTemp.transform.Rotate(new Vector3(0, 0, 90));
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-                case (int)ViewerConstants.PLANE.REAL:
-                    transformTemp.transform.rotation = vessel.vesselTransform.rotation;
-                    meshTransMatrix = transformTemp.transform.localToWorldMatrix * meshTransMatrix;
-                    break;
-            }
-            Matrix4x4 FLATTER;
-            if (zeroFlatter)
-            {
-                FLATTER = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 1));
-            }
-            else {
-                FLATTER = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0.001f));
-            }
-            //scale z by zero to flatten and prevent culling
-            meshTransMatrix = FLATTER * meshTransMatrix;
-            return meshTransMatrix;
+            return (zeroFlatter ? worldToScreen : worldToScreenFlattened) * meshTrans.localToWorldMatrix;
         }
 
         /// <summary>
@@ -1613,13 +1572,11 @@ namespace VesselView
                     }
                 case (int)ViewerConstants.COLORMODE.FUEL:
                     Color color2 = Color.red;
-//                  List<PartResource> resList = part.Resources.list;
-                    List<PartResource> resList = part.Resources.dict.Values.ToList();
-                    int resCount = resList.Count;
+                    int resCount = part.Resources.dict.Count;
                     int emptyRes = 0;
                     double totalResFraction = 0;
                     //go through all the resources in the part, add up their fullness
-                    foreach (PartResource resource in resList)
+                    foreach (PartResource resource in part.Resources.dict.Values)
                     {
                         //2 is almost empty anyway for all but the smallest tanks 
                         //and it eliminates things like intakes or power generating engines
@@ -1745,7 +1702,7 @@ namespace VesselView
                     }
                     return genFractColor(1f-stall);
                 case (int)ViewerConstants.COLORMODE.HIDE:
-                    return Color.black;
+                    return Color.clear;
                 default:
                     return Color.white;
             }

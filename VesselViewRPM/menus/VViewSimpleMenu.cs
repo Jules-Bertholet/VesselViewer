@@ -28,7 +28,7 @@ namespace VesselViewRPM.menus
             this.name = name;
         }
         
-        public void printMenu(ref StringBuilder builder, int width, int height)
+        public void printMenu(StringBuilder builder, int width, int height)
         {
             builder.Append("-|");
             builder.Append(name);

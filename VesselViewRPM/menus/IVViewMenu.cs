@@ -8,7 +8,7 @@ namespace VesselViewRPM.menus
 {
     public interface IVViewMenu
     {
-        void printMenu(ref StringBuilder builder, int width, int height);
+        void printMenu(StringBuilder builder, int width, int height);
 
         void up();
         void down();
